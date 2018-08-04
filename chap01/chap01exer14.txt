@@ -1,0 +1,136 @@
+*Exercise 1.14:* Draw the tree illustrating the process generated
+by the `count-change' procedure of section *Note 1-2-2:: in making
+change for 11 cents.  What are the orders of growth of the space
+and number of steps used by this process as the amount to be
+changed increases?
+
+-----------------------------------------------------------------
+
+
+Recall the function definitions:
+--------------------------------
+
+     (define (count-change amount)
+       (cc amount 5))
+
+     (define (cc amount kinds-of-coins)
+       (cond ((= amount 0) 1)
+             ((or (< amount 0) (= kinds-of-coins 0)) 0)
+             (else (+ (cc amount
+                          (- kinds-of-coins 1))
+                      (cc (- amount
+                             (first-denomination kinds-of-coins))
+                          kinds-of-coins)))))
+
+     (define (first-denomination kinds-of-coins)
+       (cond ((= kinds-of-coins 1) 1)
+             ((= kinds-of-coins 2) 5)
+             ((= kinds-of-coins 3) 10)
+             ((= kinds-of-coins 4) 25)
+             ((= kinds-of-coins 5) 50)))
+
+
+
+
+The following graph is copied from http://community.schemewiki.org/?sicp-ex-1.14
+--------------------------------------------------------------------------------
+
+(count-change 11)
+|
+(cc 11 5)__
+|          \
+(cc 11 4)   (cc -39 5)
+|       \___
+|           \
+(cc 11 3)   (cc -14 4)
+|       \_______________________________________________________
+|                                                               \
+(cc 11 2)                                                      (cc 1 3)
+|       \_________________________                              |     \__
+|                                 \                             |        \
+(cc 11 1)                        (cc 6 2)                      (cc 1 2) (cc -9 2)
+|       \___                      |     \__                     |     \__
+|           \                     |        \                    |        \
+(cc 11 0)   (cc 10 1)            (cc 6 1) (cc 1 2)             (cc 1 1) (cc -4 2)
+         __/ |                 __/ |       |     \__            |     \__
+        /    |                /    |       |        \           |        \
+(cc 10 0)   (cc 9 1)  (cc 6 0)   (cc 5 1) (cc 1 1) (cc -4 2)   (cc 1 0) (cc 0 1)
+         __/ |                 __/ |       |     \__
+        /    |                /    |       |        \
+(cc 9 0)    (cc 8 1)  (cc 5 0)   (cc 4 1) (cc 1 0) (cc 0 1)
+         __/ |                 __/ |
+        /    |                /    |
+(cc 8 0)    (cc 7 1)  (cc 4 0)   (cc 3 1)
+         __/ |                 __/ |
+        /    |                /    |
+(cc 7 0)    (cc 6 1)  (cc 3 0)   (cc 2 1)
+         __/ |                 __/ |
+        /    |                /    |
+(cc 6 0)    (cc 5 1)  (cc 2 0)   (cc 1 1)
+         __/ |                 __/ |
+        /    |                /    |
+(cc 5 0)    (cc 4 1)  (cc 1 0)   (cc 0 1)
+         __/ |
+        /    |
+(cc 4 0)    (cc 3 1)
+         __/ |
+        /    |
+(cc 3 0)    (cc 2 1)
+         __/ |
+        /    |
+(cc 2 0)    (cc 1 1)
+         __/ |
+        /    |
+(cc 1 0)    (cc 0 1)
+
+
+
+
+Time complexity analysis:
+-------------------------
+
+Let `a` denote the amount to make change for, and let the coin denominations be
+denoted as d_1, ..., d_r.  Let f(a, r) denote the complexity for `a` amount of
+change using coins d_1, ..., d_r.  Then
+
+    f(a, 1) = 1 + 2a = O(a).
+
+Next,
+
+    f(a, 2) = 1 + f(a, 1) + f(a - d_2, 2)
+
+            = 1 + f(a, 1) + [1 + f(a - 2_2, 1) + f(a - 2*d_2, 2)]
+
+            =   ...
+
+            = floor(a / d_2) + sum_{k = 0}^{floor(a / d_2)} f(a - k*d_2, 1) + O(1)
+
+            =      O(a)      +                   O(a^2)                     + O(1)
+
+            = O(a^2).
+
+To convince yourself that the sum has complexity of O(a^2) suppose for example
+that a = 26 and d_2 = 5.  Then we have complexities of f(1, 1), f(5, 1), ...,
+f(20, 1), f(25, 1).  We can combine the complexities of [f(1, 1) + f(25, 1)] +
+[f(6, 1) + f(20, 1)] and so on and thus we have O(a) operations each with O(a)
+complexity.
+
+A similar argument can then be made for f(a, 3).  This time we have O(a)
+operations of f(a - k*d_2, 2) complexity which in total gives us O(a^3)
+complexity.
+
+In general, by using induction we can conclude that for fixed `r` the complexity
+is O(a^r) (i.e. is polynomial in `a`).
+
+
+
+
+Space complexity analysis:
+--------------------------
+
+The space required to perform the calculations, assuming a normal order
+interpreter, is the maximum depth of the call tree (recall this definition from
+section 1.1.5).  This is because the interpreter will obtain the values for the
+arguments using a depth-first evaluation scheme.  For this particular algorithm
+the depth of the tree the depth is O(a) (c.f. the left-hand branch of the above
+figure).

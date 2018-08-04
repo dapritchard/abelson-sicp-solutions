@@ -23,8 +23,8 @@ iterative or recursive?
 version 1 full:
 ---------------
 
-this answer explicitly lists all of the steps.  See the following answer for an
-simplified presentation, as well as a discussion of algorithm complexity.
+this answer explicitly lists all of the steps.  See the following answer for a
+more concise presentation, as well as a discussion of algorithm complexity.
 
 
 (+ 4 5)
@@ -107,8 +107,8 @@ first argument.
 version 2 full:
 ---------------
 
-this answer explicitly lists all of the steps.  See the following answer for an
-simplified presentation, as well as a discussion of algorithm complexity.
+this answer explicitly lists all of the steps.  See the following answer for a
+more concise presentation, as well as a discussion of algorithm complexity.
 
 
 (+ 4 5)
