@@ -1,0 +1,204 @@
+\documentclass{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsthm}
+\usepackage{mathtools}
+
+% new theorem-like environment
+\newtheorem{proposition}{Proposition}
+
+\begin{document}
+
+
+
+
+% question ---------------------------------------------------------------------
+
+\noindent \textbf{Exercise 1.13:} Prove that
+\begin{equation*}
+  \mathit{Fib}(n) \text{ is the closest integer to }
+  \frac{ \phi^n }{ \sqrt{5} }, \text{ where } \phi = \frac{1 + \sqrt{5}}{2}.
+\end{equation*}
+Hint: let $\Psi = \frac{1 - \sqrt{5}}{2}$.  Use induction and the definition of
+the Fibonacci numbers (see section 1.2.2) to prove that
+\begin{equation*}
+  \mathit{Fib}(n) = \frac{\phi^n - \Psi^n}{\sqrt{5}}.
+\end{equation*}
+
+\hrule
+\vspace{10mm}
+
+
+
+
+% proposition 1 ----------------------------------------------------------------
+
+We begin with a pair of identities which will be of use later.  Recall that
+Proposition \ref{phi-identity} was provided in Section 1.2.2.
+
+\begin{proposition}
+  \label{phi-identity}
+  $\phi^2 = \phi + 1$.
+\end{proposition}
+
+\begin{proof}
+  We have
+  \begin{equation*}
+    \phi^2
+    = \left( \frac{ 1 + \sqrt{5} }{ 2 } \right)^2
+    = \frac{ 1 + 2\sqrt{5} + 5 }{ 4 }
+    = \frac{ 3 + \sqrt{5} }{ 2 },
+  \end{equation*}
+  and
+  \begin{equation*}
+    1 + \phi
+    = 1 + \frac{ 1 + \sqrt{5} }{ 2 }
+    = \frac{ 3 + \sqrt{5} }{ 2 }.
+  \end{equation*}
+\end{proof}
+\vspace{5mm}
+
+
+
+
+% proposition 2 ----------------------------------------------------------------
+
+\begin{proposition}
+  $\Psi^2 = \Psi + 1$.
+\end{proposition}
+
+\begin{proof}
+  We have
+  \begin{equation*}
+    \Psi^2
+    = \left( \frac{ 1 - \sqrt{5} }{ 2 } \right)^2
+    = \frac{ 1 - 2\sqrt{5} + 5 }{ 4 }
+    = \frac{ 3 - \sqrt{5} }{ 2 },
+  \end{equation*}
+  and
+  \begin{equation*}
+    1 + \Psi
+    = 1 + \frac{ 1 - \sqrt{5} }{ 2 }
+    = \frac{ 3 - \sqrt{5} }{ 2 }.
+  \end{equation*}
+\end{proof}
+\vspace{5mm}
+
+
+
+
+% proposition 3 ----------------------------------------------------------------
+
+\begin{proposition}
+  $\displaystyle \mathit{Fib}(n) = \frac{\phi^n - \Psi^n}{\sqrt{5}}.$
+\end{proposition}
+
+\begin{proof}
+  We are going to use induction and make use of the definition of the Fibonacci
+  sequence (in this case
+  $\mathit{Fib}(n + 2) = \mathit{Fib}(n + 1) + \mathit{Fib}(n)$) as the hint
+  suggests.  Since we need to look back two terms for induction, we need to
+  establish two base cases.
+
+  \paragraph{First base case: $n = 0$.}
+  \begin{equation*}
+    \frac{\phi^0 - \Psi^0}{\sqrt{5}} = \frac{1 - 1}{\sqrt{5}} = 0 = \mathit{Fib}(0).
+  \end{equation*}
+
+  \paragraph{Second base case: $n = 1$.}
+  \begin{equation*}
+    \frac{\phi^1 - \Psi^1}{\sqrt{5}}
+    = \frac{ 1 }{ \sqrt{5} }
+    \left[
+      \frac{ 1 + \sqrt{5} }{ 2 } - \frac{ 1 - \sqrt{5} }{ 2 }
+    \right]
+    = \frac{ 1 }{ \sqrt{5} }\, \frac{ 2 \sqrt{5} }{ 2 }
+    = 1
+    = \mathit{Fib}(1).
+  \end{equation*}
+
+  \paragraph{Induction step.}  Note that although for convenience we will work
+  in the opposite direction as we did for the base cases, since we are dealing
+  with equalities they are of course equivalent.
+  \begin{align*} \MoveEqLeft
+    \mathit{Fib}(n + 2) = \mathit{Fib}(n + 1) + \mathit{Fib}(n) \\[1ex]
+    &= \frac{\phi^{n + 1} - \Psi^{n + 1}}{\sqrt{5}}
+      + \frac{\phi^n - \Psi^n}{\sqrt{5}} \\[1ex]
+    &= \frac{ 1 }{ \sqrt{5} }
+      \Big[
+      \phi^{n + 1} + \phi^n - (\Psi^{n + 1} + \Psi^n)
+      \Big] \\[1ex]
+    &= \frac{ 1 }{ \sqrt{5} }
+      \Big[
+      \phi^n(\phi + 1) - \Psi^n(\Psi + 1)
+      \Big] \\[1ex]
+    &= \frac{ 1 }{ \sqrt{5} }
+      \Big[
+      \phi^n\phi^2 - \Psi^n\Psi^2
+      \Big] && \text{(by Proposition 1 and 2)} \\[1ex]
+    &= \frac{\phi^{n + 2} - \Psi^{n + 2}}{\sqrt{5}}
+  \end{align*}
+
+\end{proof}
+\vspace{5mm}
+
+
+
+
+% proposition 4 ----------------------------------------------------------------
+
+Now we will go ahead and prove the main clam.  The way that this is achieved is
+by showing that the difference between $\mathit{Fib}(n)$ and the approximation
+$\frac{ \phi^n }{ \sqrt{5} }$ is always less than $\frac{1}{2}$, from which the
+claim immediately follows.
+
+\begin{proposition}
+  $\displaystyle \left| \mathit{Fib}(n) - \frac{ \phi^n }{ \sqrt{5} } \right| < \frac{1}{2}$.
+\end{proposition}
+
+\begin{proof}
+  We first note that
+  \begin{equation*}
+    \Psi = \frac{ 1 - \sqrt{5} }{ 2 } < \frac{ 1 - \sqrt{4} }{ 2 } = - \frac{1}{2},
+  \end{equation*}
+  and that
+  \begin{equation*}
+    \Psi = \frac{ 1 - \sqrt{5} }{ 2 } > \frac{ 1 - \sqrt{9} }{ 2 } = -1,
+  \end{equation*}
+  so it follows that
+  \begin{equation*}
+    -1 < \Psi^n < 1.
+  \end{equation*}
+  Next we have
+  \begin{equation*}
+    \mathit{Fib}(n) - \frac{ \phi^n }{ \sqrt{5} }
+    = - \frac{ \Psi^n }{ \sqrt{5} }
+    < \frac{ 1 }{ \sqrt{5} }
+    < \frac{ 1 }{ \sqrt{4} }
+    = \frac{ 1 }{ 2 },
+  \end{equation*}
+  and similarly
+  \begin{equation*}
+    \mathit{Fib}(n) - \frac{ \phi^n }{ \sqrt{5} }
+    = - \frac{ \Psi^n }{ \sqrt{5} }
+    > - \frac{ 1 }{ \sqrt{5} }
+    > - \frac{ 1 }{ \sqrt{4} }
+    = - \frac{ 1 }{ 2 }.
+  \end{equation*}
+  Putting these last two inequalities together gives us
+  \begin{equation*}
+    -\frac{1}{2} < \mathit{Fib}(n) - \frac{ \phi^n }{ \sqrt{5} } < \frac{1}{2},
+  \end{equation*}
+  which is equivalent to the desired form.
+\end{proof}
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
