@@ -1,0 +1,478 @@
+\documentclass{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+% \usepackage{mathtools}
+\usepackage{listings}
+\usepackage[x11names]{xcolor}
+
+% define a global font for listings environments
+\lstset{basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont}
+
+% define a listings environment for Scheme
+\lstdefinestyle{scheme}{%
+  frame=lines,
+  language=lisp,
+  basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont,
+  keywordstyle=\color{Blue1},
+  commentstyle=\color{DarkOrchid4},
+  morekeywords={define},
+  deletekeywords={count}
+}
+
+% new theorem-like environment
+\newtheorem{proposition}{Proposition}
+
+
+
+
+\begin{document}
+
+
+% question ---------------------------------------------------------------------
+
+\noindent \textbf{Exercise 1.19:} There is a clever algorithm for computing the
+Fibonacci numbers in a logarithmic number of steps.  Recall the transformation
+of the state variables $a$ and $b$ in the \lstinline{fib-iter} process of
+section 1.2.2: $a \leftarrow a + b$ and $b \leftarrow a$.  Call this
+transformation $T$, and observe that applying $T$ over and over again $n$ times,
+starting with 1 and 0, produces the pair $\mathit{Fib}(n + 1)$ and
+$\mathit{Fib}(n)$.
+
+In other words, the Fibonacci numbers are produced by applying $T^n$, the $n$-th
+power of the transformation $T$, starting with the pair $(1,0)$.  Now consider
+$T$ to be the special case of $p = 0$ and $q = 1$ in a family of transformations
+$T_{pq}$, where $T_{pq}$ transforms the pair $(a,b)$ according to
+$a \leftarrow bq + aq + ap$ and $b \leftarrow bp + aq$.  Show that if we apply
+such a transformation $T_{pq}$ twice, the effect is the same as using a single
+transformation $T_{p^{\prime}q^{\prime}}$ of the same form, and compute
+$p^{\prime}$ and $q^{\prime}$ in terms of $p$ and $q$.  This gives us an
+explicit way to square these transformations, and thus we can compute $T^n$
+using successive squaring, as in the \lstinline{fast-expt} procedure.  Put this
+all together to complete the following procedure, which runs in a logarithmic
+number of steps:
+
+\vspace{5mm}
+\begin{lstlisting}[style=scheme]
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   <??>      ; compute p'
+                   <??>      ; compute q'
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+\end{lstlisting}
+
+\vspace{10mm}
+
+
+
+% begin solution ---------------------------------------------------------------
+
+\noindent To begin with, we want to find a function
+$T: \mathbb{R}^2 \mapsto \mathbb{R}^2$ such that $T(a, b) = (a + b, a)$.  It is
+easy to intuit that $T$ is the linear operator defined by
+\begin{equation*}
+  T =
+  \begin{bmatrix}
+    1 & 1 \\
+    1 & 0
+  \end{bmatrix},
+\end{equation*}
+and we can write $T(a, b)$ in the form
+\begin{equation*}
+  T
+  \begin{bmatrix}
+    a \\
+    b
+  \end{bmatrix}
+  =
+  \begin{bmatrix}
+    a + b \\
+    b
+  \end{bmatrix}.
+\end{equation*}
+Next, Proposition \ref{fast-iter-proof} formally states the procedure performed
+by the \lstinline{fib-iter} process of section 1.2.2.
+
+
+
+
+% proposition 1 ----------------------------------------------------------------
+
+\vspace{10mm}
+\begin{proposition}
+  \label{fast-iter-proof}
+  Let $T: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the linear operator defined by
+  \begin{equation*}
+    T =
+    \begin{bmatrix}
+      1 & 1 \\
+      1 & 0
+    \end{bmatrix},
+  \end{equation*}
+  and let us write $F_k$ as a shorthand for $\mathit{Fib}(k), k = 0, 1, \dots$.
+  Then
+  \begin{equation*}
+    T^n
+    \begin{bmatrix}
+      F_1 \\
+      F_0
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      F_{n + 1} \\
+      F_n
+    \end{bmatrix}
+  \end{equation*}
+\end{proposition}
+
+\vspace{5mm}
+\begin{proof}
+  We proceed with proof by induction.
+  \paragraph{Base case:} $n = 1$.
+  \begin{equation*}
+    T^1
+    \begin{bmatrix}
+      F_1 \\
+      F_0
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      1 & 1 \\
+      1 & 0
+    \end{bmatrix}
+    \begin{bmatrix}
+      F_! \\
+      F_0
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      F_1 + F_0 \\
+      F_1
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      F_2 \\
+      F_1
+    \end{bmatrix}
+  \end{equation*}
+
+  \paragraph{Induction step:} Assume that the claim holds for the $(n - 1)$-th
+  case.  Then
+  \begin{equation*}
+    T^n
+    \begin{bmatrix}
+      F_1 \\
+      F_0
+    \end{bmatrix}
+    =
+    T T^{n - 1}
+    \begin{bmatrix}
+      F_1 \\
+      F_0
+    \end{bmatrix}
+    =
+    T
+    \begin{bmatrix}
+      F_{n} \\
+      F_{n - 1}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      1 & 1 \\
+      1 & 0
+    \end{bmatrix}
+    \begin{bmatrix}
+      F_{n} \\
+      F_{n - 1}
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      F_{n} + F_{n - 1} \\
+      F_n
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      F_{n + 1} \\
+      F_n
+    \end{bmatrix}.
+  \end{equation*}
+
+\end{proof}
+\vspace{5mm}
+
+
+
+
+% ------------------------------------------------------------------------------
+
+\noindent Next, we are directed to find a function
+$T_{pq}: \mathbb{R}^2 \mapsto \mathbb{R}^2$ such that
+$T_{pq}(a, b) = (bq + aq + ap,~ bp + aq)$.  The reason that we want to find the
+form of this particular family of operators is described as follows.
+
+Recall from Proposition \ref{fast-iter-proof} that we can calculate the
+$(n + 1)$-th value of the Fibonacci sequence by calculating $T^n (F_1, F_0)$.
+In the \lstinline{fib-iter} process of section 1.2.2 we performed this
+calculation by applying the $T$ operator $n$ times.  However the goal of the
+logarithmic Fibonacci algorithm is to successively square terms of $T$ as in
+e.g.  $((T^2)^2)^2$, when possible.  In general, we can track the value of any
+$2 \times 2$ matrix such as those obtained from calculating $T^k$ for some
+$k \in \mathbb{N}$ using four variables (e.g. $t_{11}, t_{12}, t_{21}, t_{22}$),
+but as it turns out, we can track the values of $T^k$ using only 2 parameters,
+$p$ and $q$.  This statement is formalized in Proposition
+\ref{thm:parameterize-power-t}.
+
+
+\vspace{10mm}
+\begin{proposition}
+  \label{thm:parameterize-power-t}
+  Let
+  \begin{equation*}
+    T =
+    \begin{bmatrix}
+      1 & 1 \\
+      1 & 0
+    \end{bmatrix}.
+  \end{equation*}
+  Then there exist $p, q \in \{0\} \cup \mathbb{N}$ such that
+  \begin{equation*}
+    T^k =
+    \begin{bmatrix}
+      p + q & q \\
+      q     & p
+    \end{bmatrix},
+  \end{equation*}
+  for $k \in \mathbb{N}$.
+\end{proposition}
+
+\vspace{5mm}
+\begin{proof}
+  We proceed with proof by induction.
+  \paragraph{Base case:} $n = 1$.
+  \begin{equation*}
+    T^1 =
+    \begin{bmatrix}
+      1 & 1 \\
+      1 & 0
+    \end{bmatrix},
+  \end{equation*}
+  so by letting $p = 0$ and $q = 1$ we have the desired form.
+
+  \paragraph{Induction step:} Assume that the claim holds for the $k$-th case.
+  Then
+  \begin{equation*}
+    T^{k + 1} = TT^k = T
+    \begin{bmatrix}
+      p + q & q \\
+      q     & p
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      p + 2q & p + q \\
+      p + q  & q
+    \end{bmatrix},
+  \end{equation*}
+  so that by letting $p^{\prime} = q$ and $q^{\prime} = p + q$ we see that
+  \begin{equation*}
+    T^{k + 1} =
+    \begin{bmatrix}
+      p^{\prime} + q^{\prime} & q^{\prime} \\
+      q^{\prime}             & p^{\prime}
+    \end{bmatrix},
+  \end{equation*}
+  and we have the desired form.
+\end{proof}
+\vspace{5mm}
+
+Now that we have some intuition as to why we are considering a family of
+transformations $\{T_{pq}\}$, we can return to the problem of finding an
+operator $T_{pq}: \mathbb{R}^2 \mapsto \mathbb{R}^2$ such that
+$T_{pq}(a, b) = (bq + aq + ap,~ bp + aq)$.  If we posit that for fixed $p, q$
+then $T_{pq}$ is a linear operator, then we can find the operator by solving a
+system of equations, since it turns out to indeed be linear.  Furthermore, the
+family of operators $\{T_{pq}\}$ are those operators described in Proposition
+\ref{thm:parameterize-power-t}, as stated below.
+
+% \vspace{40mm}
+% We were told that $T$ is a special
+% case of $T_{pq}$, so if we make a guess that for fixed values of $p$ and $q$
+% then $T_{pq}$ is a linear operator, then we can attempt to solve the system of
+% equations given by
+\begin{proposition}
+  \label{thm:t-pq}
+  Let $T_{pq}$ be defined as
+  \begin{equation*}
+    T_{pq} =
+    \begin{bmatrix}
+      p + q & q \\
+      q     & p
+    \end{bmatrix},
+  \end{equation*}
+  then
+  \begin{equation*}
+    T_{pq}(a, b) = (bq + aq + ap,~ bp + aq),
+  \end{equation*}
+  which is the statement in the problem prompt.
+\end{proposition}
+\vspace{5mm}
+
+\begin{proof}
+  We have
+  \begin{equation*}
+    T_{pq}
+    \begin{bmatrix}
+      a \\
+      b
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      p + q & q \\
+      q     & p
+    \end{bmatrix}
+    \begin{bmatrix}
+      a \\
+      b
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      pa + qa + qb \\
+      qa + pb
+    \end{bmatrix},
+  \end{equation*}
+  which is equivalent to the form stated in the claim.
+\end{proof}
+\vspace{5mm}
+
+
+Next, we are directed to find the parameterization of the operator that results
+from squaring $T_{pq}$.  This is the topic of Proposition \ref{thm:t-square}.
+\begin{proposition}
+  \label{thm:t-square}
+  The operator that results from squaring $T_{pq}$ is given by
+  \begin{equation*}
+    T_{pq}^2 = T_{p^{\prime} q^{\prime}},
+  \end{equation*}
+  where $p^{\prime} = p^2 + q^2$ and $q^{\prime} = 2pq + q^2$.
+\end{proposition}
+\vspace{5mm}
+
+\begin{proof}
+  \begin{equation*}
+    T_{pq}^2 =
+    \begin{bmatrix}
+      p + q & q \\
+      q     & p
+    \end{bmatrix}
+    \begin{bmatrix}
+      p + q & q \\
+      q     & p
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      (p + q)^2 + q^2 & 2pq + q^2 \\
+      2pq + q^2        & p^2 + q^2
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+      p^{\prime} + q^{\prime} & q^{\prime} \\
+      q^{\prime}             & p^{\prime}
+    \end{bmatrix},
+  \end{equation*}
+  where $p^{\prime} = p^2 + q^2$ and $q^{\prime} = 2pq + q^2$.  Since this is
+  the form of the family of operators $\{T_{pq}\}$, the claim follows.
+\end{proof}
+\vspace{5mm}
+
+Now that we have all of the pieces in place, we want to describe an approach for
+calculating the $(n + 1)$-th term in the Fibonacci sequence.  The main idea is
+to consider the expression $T_{01}^n(F_1, F_0) = (F_{n + 1}, F_n)$, and at each
+step of the algorithm to consider an equivalent form of the expression with a
+reduced value of $n$.  We consider the following two identities.  When $n$ is
+even, then we consider the identity
+\begin{equation*}
+  T_{pq}^n
+  \begin{bmatrix}
+    a \\
+    b
+  \end{bmatrix}
+  = \left(T_{pq}^2\right)^{n / 2}
+  \begin{bmatrix}
+    a \\
+    b
+  \end{bmatrix}
+  =
+  T_{p^{\prime} q^{\prime}}^{n / 2}
+  \begin{bmatrix}
+    a \\
+    b
+  \end{bmatrix},
+\end{equation*}
+and when $n$ is odd, then we consider the identity
+\begin{equation*}
+  T_{pq}^n
+  \begin{bmatrix}
+    a \\
+    b
+  \end{bmatrix}
+  = T_{pq}^{n - 1} T_{pq}
+  \begin{bmatrix}
+    a \\
+    b
+  \end{bmatrix}
+  = T_{pq}^{n - 1}
+  \begin{bmatrix}
+    a^{\prime} \\
+    b^{\prime}
+  \end{bmatrix},
+\end{equation*}
+Thus we can construct an algorithm that at each step converts the data according
+to one of these two identities, and terminates when $n = 0$.  Since $n$ is
+always decreasing the algorithm is guaranteed to terminate, and since the value
+of the expression is unchanged at each step of the algorithm, we are guaranteed
+to obtain the correct result.
+
+The implementation of this procedure is provided below (where
+\lstinline{count} tracks the value of $n$).
+
+\vspace{5mm}
+\begin{lstlisting}[style=scheme]
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (square p) (square q))
+                   (+ (* 2 p q) (square q))
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+\end{lstlisting}
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
