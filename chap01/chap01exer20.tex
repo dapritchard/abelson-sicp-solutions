@@ -219,11 +219,58 @@ calculating $a \bmod b$ for each step, which grows as a function of $a$ and $b$.
 
 
 
+% applicative-order evaluation -------------------------------------------------
+
+
+\paragraph{Applicative-order evaluation.}  Next we perform applicative-order
+evaluation for the a call to \lstinline{(gcd 206 40)}.  We can see that there
+are 4 evaluations of the \lstinline{remainder} procedure in total.
+
+\vspace{3mm}
+\begin{lstlisting}[style=scheme]
+(gcd 206 40)
+(if (= 40 0)
+    206
+    (gcd 40 (remainder 206 40)))
+(gcd 40 (remainder 206 40))
+
+(gcd 40 6)
+(if (= 6 0)
+    40
+    (gcd 6 (remainder 40 6)))
+(gcd 6 (remainder 40 6))
+
+(gcd 6 4)
+(if (= 4 0)
+    6
+    (gcd 6 (remainder 6 4)))
+(gcd 6 (remainder 6 4))
+
+(gcd 4 2)
+(if (= 2 0)
+    4
+    (gcd 2 (remainder 4 2)))
+(gcd 2 (remainder 4 2))
+
+(gcd 2 0)
+(if (= 0 0)
+    2
+    (gcd 0 (remainder 2 0)))
+2
+\end{lstlisting}
+\vspace{10mm}
+
+
+
+
 % normal-order evaluation ------------------------------------------------------
 
-\noindent Normal-order evaluation.  We can see that there are 18 total
+\paragraph{Normal-order evaluation.}  Next we perform normal-order evaluation
+for the a call to \lstinline{(gcd 206 40)}.  We can see that there are 18 total
 evaluations of the \lstinline{remainder} procedure: 14 that result when
 evaluating the conditional, and 4 in the final reduction phase.
+
+\vspace{3mm}
 \begin{lstlisting}[style=scheme]
 ;; a = 206
 ;; b = 40
@@ -316,48 +363,6 @@ evaluating the conditional, and 4 in the final reduction phase.
 (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
 2
 \end{lstlisting}
-
-
-
-
-% applicative-order evaluation -------------------------------------------------
-
-\noindent Applicative-order evaluation.  We can see that there are 4 evaluations
-of the \lstinline{remainder} procedure.
-\begin{lstlisting}[style=scheme]
-(gcd 206 40)
-(if (= 40 0)
-    206
-    (gcd 40 (remainder 206 40)))
-(gcd 40 (remainder 206 40))
-
-(gcd 40 6)
-(if (= 6 0)
-    40
-    (gcd 6 (remainder 40 6)))
-(gcd 6 (remainder 40 6))
-
-(gcd 6 4)
-(if (= 4 0)
-    6
-    (gcd 6 (remainder 6 4)))
-(gcd 6 (remainder 6 4))
-
-(gcd 4 2)
-(if (= 2 0)
-    4
-    (gcd 2 (remainder 4 2)))
-(gcd 2 (remainder 4 2))
-
-(gcd 2 0)
-(if (= 2 0)
-    2
-    (gcd 0 (remainder 2 0)))
-2
-\end{lstlisting}
-
-
-
 
 \end{document}
 
