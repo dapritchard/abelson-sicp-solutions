@@ -18,7 +18,7 @@
   basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont,
   keywordstyle=\color{Blue1},
   commentstyle=\color{DarkOrchid4},
-  morekeywords={define},
+  morekeywords={define, if},
   deletekeywords={count, gcd}
 }
 
@@ -59,18 +59,25 @@ evaluation of \lstinline{(gcd 206 40)}?  In the applicative-order evaluation?
 
 
 
+% preamble ---------------------------------------------------------------------
+
 Before we answer this question, we do some work to establish the claim that
 $\GCD(a,b) = \GCD(b,r)$, and that the number of steps required by the algorithm
 has order $\mathcal{O}(\log b)$.
 
 We note however that we do not establish the stronger claim that the number of
-steps required by the algorithm has order $\Theta(\log b)$, as is stated in the
-book, since it seems that the lower bound for the number of steps is 1 (for
+steps required by the algorithm has order $\Theta(\log b)$, as it is stated in
+the book, since it seems that the lower bound for the number of steps is 1 (for
 example, when $a = b$).  We also note that this isn't a result for the overall
 complexity of the algorithm, since it doesn't account for the cost of actually
-calculating $a \bmod b$, which grows as a function of $a$ and $b$.
+calculating $a \bmod b$ for each step, which grows as a function of $a$ and $b$.
 
 \vspace{5mm}
+
+
+
+
+% GCD equivalency --------------------------------------------------------------
 
 \begin{proposition}
   Suppose $a, b \in \mathbb{N}$ with $a \geq b$.  If $r$ is the remainder when
@@ -80,7 +87,7 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
 \begin{proof}
   Note that there exists some $q \in \mathbb{N}$ such that $a = qb + r$.
   Suppose that $\GCD(a, b) = k$.  Since $b \bmod k = 0$, it follows that
-  $wb \bmod k = 0$.  Then, because of this fact and since $a \bmod k = 0$, it
+  $qb \bmod k = 0$.  Then, because of this fact and since $a \bmod k = 0$, it
   follows that $r \bmod k = 0$.  This shows that $k$ is a common divisor of $b$
   and $r$, and consequently we have that $k \leq \GCD(b, r)$.
 
@@ -98,13 +105,10 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
 \end{proof}
 \vspace{5mm}
 
-% Let $f: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the function that maps successive
-% pairs in Euclid's algorithm.  Formally, we define
-% \begin{equation*}
-%   f(a, b) = (b,\, a \bmod b).
-% \end{equation*}
 
 
+
+% b_{k + 1} >= b_k + b_{k - 1} -------------------------------------------------
 
 \begin{proposition}
   \label{thm:bound-for-euclid-bs}
@@ -112,7 +116,6 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
   $(a_{k - 1}, b_{k - 1})$ are successive pairs obtained using Euclid's
   algorithm, then $b_{k + 1} \geq b_k + b_{k - 1}$.
 \end{proposition}
-
 
 \begin{proof}
   Let $f: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the function that maps
@@ -131,10 +134,13 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
   \end{equation*}
   since $q \geq 1$.
 \end{proof}
+
 \vspace{5mm}
 
 
 
+
+% Lame's Theorem ---------------------------------------------------------------
 
 \begin{theorem}[Lam\'e's Theorem]
   If Euclid's Algorithm requires $k$ steps to compute the greatest common
@@ -145,11 +151,8 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
 \begin{proof}
   For the following proof, we assume that we start with a pair of integers
   $(a, b)$ such that $a \geq b \geq 1$, and we say that the algorithm terminates
-  when some pair $(a^{\prime}, 0)$ is obtained.
-
-  % Let $f: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the function that maps
-  % successive pairs in Euclid's algorithm, so that $f(a, b) = (b,\, a \bmod b)$.
-  We proceed with proof-by-induction.
+  when some pair $(a^{\prime}, 0)$ is obtained.  We proceed with
+  proof-by-induction.
 
   \paragraph{Base case.}  This is trivially true, since $\fib(1) = 1$, and by
   assumption $b \geq 1$.
@@ -176,13 +179,14 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
 
 
 
+
+% bound for the number of steps ------------------------------------------------
+
 \begin{proposition}
   Let $n$ be be the smaller of the two inputs to Euclid's algorithm.  Then
   number of steps that the algorithm requires is of the order
   $\mathcal{O}(\log n)$.
 \end{proposition}
-
-
 
 \begin{proof}
   Recall from Exercise 1.13 that
@@ -212,7 +216,154 @@ calculating $a \bmod b$, which grows as a function of $a$ and $b$.
   Euclid's algorithm has complexity $\mathcal{O}(\log n)$.
 \end{proof}
 
+
+
+
+% normal-order evaluation ------------------------------------------------------
+
+\noindent Normal-order evaluation.  We can see that there are 18 total
+evaluations of the \lstinline{remainder} procedure: 14 that result when
+evaluating the conditional, and 4 in the final reduction phase.
+\begin{lstlisting}[style=scheme]
+;; a = 206
+;; b = 40
+(gcd 206 40)
+(if (= 40 0)
+    206
+    (gcd 40 (remainder 206 40)))
+
+;; a = 40
+;; b = (remainder 206 40)
+(gcd 40 (remainder 206 40))
+(if (= (remainder 206 40) 0)
+    40
+    (gcd (remainder 206 40) (remainder 40 (remainder 206 40)))))
+;; have to evaluate the conditional so we need to calculate the values of the
+;; operands.  Perfoms one `remainder` operation.
+(if (= 6 0)
+    40
+    (gcd (remainder 206 40) (remainder 40 (remainder 206 40)))))
+
+;; a = (remainder 206 40)
+;; b = (remainder 40 (remainder 206 40))
+(gcd (remainder 206 40) (remainder 40 (remainder 206 40)))
+(if (= (remainder 40 (remainder 206 40)) 0)
+    (remainder 206 40)
+    (gcd (remainder 40 (remainder 206 40)
+         (remainder (remainder 206 40)
+         (remainder 40 (remainder 206 40))))))
+;; have to evaluate the conditional so we need to calculate the values of the
+;; operands.  Performs two `remainder` calculations.
+(if (= 4 0)
+    (remainder 206 40)
+    (gcd (remainder 40 (remainder 206 40))
+         (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))))
+
+;; a = (remainder 40 (remainder 206 40))
+;; b = (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+(gcd (remainder 40 (remainder 206 40))
+     (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+(if (= (remainder (remainder 206 40) (remainder 40 (remainder 206 40))) 0)
+    (remainder 40 (remainder 206 40))
+    (gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+         (remainder (remainder 40 (remainder 206 40))
+                    (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40)))
+;; have to evaluate the conditional so we need to calculate the values of the
+;; operands.  Performs four `remainder` calculations.
+(if (= 2 0)
+    (remainder 40 (remainder 206 40))
+    (gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+         (remainder (remainder 40 (remainder 206 40))
+                    (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40))))))
+
+;; a = (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+;; b = (remainder (remainder 40 (remainder 206 40))
+;;                (remainder (remainder 206 40)
+;;                           (remainder 40 (remainder 206 40))))
+(gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+     (remainder (remainder 40 (remainder 206 40))
+                (remainder (remainder 206 40)
+                           (remainder 40 (remainder 206 40)))))
+(if (= (remainder (remainder 40 (remainder 206 40))
+                  (remainder (remainder 206 40)
+                             (remainder 40 (remainder 206 40))))
+       0)
+    (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+    (gcd (remainder (remainder 40 (remainder 206 40))
+                    (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40))))
+         (remainder (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40)))
+                    (remainder (remainder 40 (remainder 206 40))
+                               (remainder (remainder 206 40)
+                                          (remainder 40 (remainder 206 40)))))))
+;; have to evaluate the conditional so we need to calculate the values of the
+;; operands.  Performs seven `remainder` calculations.
+(if (= 0 0)
+    (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+    (gcd (remainder (remainder 40 (remainder 206 40))
+                    (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40))))
+         (remainder (remainder (remainder 206 40)
+                               (remainder 40 (remainder 206 40)))
+                    (remainder (remainder 40 (remainder 206 40))
+                               (remainder (remainder 206 40)
+                                          (remainder 40 (remainder 206 40)))))))
+
+;; now calculate the result.  Performs four `remainder` calculations.
+(remainder (remainder 206 40) (remainder 40 (remainder 206 40)))
+2
+\end{lstlisting}
+
+
+
+
+% applicative-order evaluation -------------------------------------------------
+
+\noindent Applicative-order evaluation.  We can see that there are 4 evaluations
+of the \lstinline{remainder} procedure.
+\begin{lstlisting}[style=scheme]
+(gcd 206 40)
+(if (= 40 0)
+    206
+    (gcd 40 (remainder 206 40)))
+(gcd 40 (remainder 206 40))
+
+(gcd 40 6)
+(if (= 6 0)
+    40
+    (gcd 6 (remainder 40 6)))
+(gcd 6 (remainder 40 6))
+
+(gcd 6 4)
+(if (= 4 0)
+    6
+    (gcd 6 (remainder 6 4)))
+(gcd 6 (remainder 6 4))
+
+(gcd 4 2)
+(if (= 2 0)
+    4
+    (gcd 2 (remainder 4 2)))
+(gcd 2 (remainder 4 2))
+
+(gcd 2 0)
+(if (= 2 0)
+    2
+    (gcd 0 (remainder 2 0)))
+2
+\end{lstlisting}
+
+
+
+
 \end{document}
+
+
+
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
