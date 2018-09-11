@@ -1,0 +1,219 @@
+\documentclass{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage[x11names]{xcolor}
+
+% define a global font for listings environments
+\lstset{basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont}
+
+% define a listings environment for Scheme
+\lstdefinestyle{scheme}{%
+  frame=lines,
+  language=lisp,
+  basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont,
+  keywordstyle=\color{Blue1},
+  commentstyle=\color{DarkOrchid4},
+  morekeywords={define},
+  deletekeywords={count, gcd}
+}
+
+% new theorem-like environment
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+
+\DeclareMathOperator{\GCD}{GCD}
+\DeclareMathOperator{\fib}{Fib}
+
+
+
+
+\begin{document}
+
+
+% question ---------------------------------------------------------------------
+
+\noindent \textbf{Exercise 1.20:} The process that a procedure generates is of
+course dependent on the rules used by the interpreter.  As an example, consider
+the iterative \lstinline{gcd} procedure given below.  Suppose we were to
+interpret this procedure using normal-order evaluation, as discussed in section
+1.1.5.  (The normal-order-evaluation rule for \lstinline{if} is described in
+Exercise 1.5.)  Using the substitution method (for normal order), illustrate the
+process generated in evaluating \lstinline{(gcd 206 40)} and indicate the
+\lstinline{remainder} operations that are actually performed.  How many
+\lstinline{remainder} operations are actually performed in the normal-order
+evaluation of \lstinline{(gcd 206 40)}?  In the applicative-order evaluation?
+\vspace{3mm}
+\begin{lstlisting}[style=scheme]
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+\end{lstlisting}
+\vspace{10mm}
+
+
+
+
+Before we answer this question, we do some work to establish the claim that
+$\GCD(a,b) = \GCD(b,r)$, and that the number of steps required by the algorithm
+has order $\mathcal{O}(\log b)$.
+
+We note however that we do not establish the stronger claim that the number of
+steps required by the algorithm has order $\Theta(\log b)$, as is stated in the
+book, since it seems that the lower bound for the number of steps is 1 (for
+example, when $a = b$).  We also note that this isn't a result for the overall
+complexity of the algorithm, since it doesn't account for the cost of actually
+calculating $a \bmod b$, which grows as a function of $a$ and $b$.
+
+\vspace{5mm}
+
+\begin{proposition}
+  Suppose $a, b \in \mathbb{N}$ with $a \geq b$.  If $r$ is the remainder when
+  $a$ is divided by $b$, then $\GCD(a,b) = \GCD(b,r)$.
+\end{proposition}
+
+\begin{proof}
+  Note that there exists some $q \in \mathbb{N}$ such that $a = qb + r$.
+  Suppose that $\GCD(a, b) = k$.  Since $b \bmod k = 0$, it follows that
+  $wb \bmod k = 0$.  Then, because of this fact and since $a \bmod k = 0$, it
+  follows that $r \bmod k = 0$.  This shows that $k$ is a common divisor of $b$
+  and $r$, and consequently we have that $k \leq \GCD(b, r)$.
+
+  Now we want to show that there is no larger common divisor than $k$.  Suppose
+  that the converse is true, so that $\GCD(b, r) = k^{\prime} > k$.  Then
+  $b \bmod k^{\prime} = 0$, so it follows that $qb \bmod k^{\prime} = 0$.  Then
+  because of this fact and since $r \bmod k^{\prime} = 0$ we obtain that
+  $(qb + r) \bmod k^{\prime} = 0$ which is equivalent to
+  $a \bmod k^{\prime} = 0$.  This would mean that $k^{\prime}$ is a common
+  divisor of $a$ and $b$ from which it would follow that
+  $k < k^{\prime} \leq \GCD(a, b)$.  However, this is a contradiction since
+  $k = \GCD(a, b)$, and so we obtain that $\GCD(b, r) \leq k$
+
+  Putting these two pieces together yields $k \leq \GCD(b, r) \leq k$.
+\end{proof}
+\vspace{5mm}
+
+% Let $f: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the function that maps successive
+% pairs in Euclid's algorithm.  Formally, we define
+% \begin{equation*}
+%   f(a, b) = (b,\, a \bmod b).
+% \end{equation*}
+
+
+
+\begin{proposition}
+  \label{thm:bound-for-euclid-bs}
+  If the pairs $(a_{k + 1}, b_{k + 1}),~ (a_k, b_k)$, and
+  $(a_{k - 1}, b_{k - 1})$ are successive pairs obtained using Euclid's
+  algorithm, then $b_{k + 1} \geq b_k + b_{k - 1}$.
+\end{proposition}
+
+
+\begin{proof}
+  Let $f: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the function that maps
+  successive pairs in Euclid's algorithm, so that $f(a, b) = (b,\, a \bmod b)$.
+  Then we have that
+  \begin{equation*}
+    f(a_{k + 1}, b_{k + 1}) = (a_k, b_k) \hspace{5mm} \Longrightarrow \hspace{5mm} b_{k + 1} = a_k,
+  \end{equation*}
+  and
+  \begin{equation*}
+    f(a_{k}, b_{k}) = (a_{k - 1}, b_{k - 1}) \hspace{5mm} \Longrightarrow \hspace{5mm} a_{k} = qb_{k} + b_{k - 1}
+  \end{equation*}
+  for some $q \in \mathbb{N}$.  Substituting $b_{k + 1}$ into the second result yields
+  \begin{equation*}
+    b_{k + 1} = qb_{k} + b_{k - 1} \geq b_{k} + b_{k - 1},
+  \end{equation*}
+  since $q \geq 1$.
+\end{proof}
+\vspace{5mm}
+
+
+
+
+\begin{theorem}[Lam\'e's Theorem]
+  If Euclid's Algorithm requires $k$ steps to compute the greatest common
+  denominator of some pair, then the smaller number in the pair must be greater
+  than or equal to the $k$-th Fibonacci number.
+\end{theorem}
+
+\begin{proof}
+  For the following proof, we assume that we start with a pair of integers
+  $(a, b)$ such that $a \geq b \geq 1$, and we say that the algorithm terminates
+  when some pair $(a^{\prime}, 0)$ is obtained.
+
+  % Let $f: \mathbb{R}^2 \mapsto \mathbb{R}^2$ be the function that maps
+  % successive pairs in Euclid's algorithm, so that $f(a, b) = (b,\, a \bmod b)$.
+  We proceed with proof-by-induction.
+
+  \paragraph{Base case.}  This is trivially true, since $\fib(1) = 1$, and by
+  assumption $b \geq 1$.
+
+  \paragraph{Induction step.}  Assume that the claim holds for all integers less
+  than or equal to some value $k$ (this is the number of steps that the
+  algorithm takes to terminate).  Suppose that $(a_{k + 1}, b_{k + 1})$ is an
+  input to Euclid's algorithm that takes $k + 1$ steps to terminate, and let
+  $(a_k, b_k)$, and $(a_{k - 1}, b_{k - 1})$ denote the first two pairs obtained
+  using the algorithm, respectively.  Note that we can infer that Euclid's
+  algorithm takes $k$ steps to complete when provided $(a_k, b_k)$ as input, and
+  $k - 1$ steps to complete when provided $(a_{k - 1}, b_{k - 1})$ as input.
+
+  Now, by Proposition \ref{thm:bound-for-euclid-bs}, we have
+  $b_{k + 1} \geq b_k + b_{k - 1}$.  Furthermore, by the induction hypothesis,
+  we have that $b_k \geq \fib(b_k)$, and $b_{k - 1} \geq \fib(b_{k - 1})$.
+  Thus, it follows that
+  \begin{equation*}
+    b_{k + 1} \geq b_k + b_{k - 1} \geq \fib(k) + \fib(k - 1) = \fib(k +1),
+  \end{equation*}
+  which completes the proof.
+\end{proof}
+\vspace{5mm}
+
+
+
+\begin{proposition}
+  Let $n$ be be the smaller of the two inputs to Euclid's algorithm.  Then
+  number of steps that the algorithm requires is of the order
+  $\mathcal{O}(\log n)$.
+\end{proposition}
+
+
+
+\begin{proof}
+  Recall from Exercise 1.13 that
+  \begin{equation*}
+    \fib(k) = \frac{\phi^k - \Psi^k}{\sqrt{5}},
+  \end{equation*}
+  where $\phi = \frac{1}{2}(1 + \sqrt{5})$ and
+  $\Psi = \frac{1}{2}(1 - \sqrt{5})$.  Also recall that it was established in
+  that exercise that $-1 < \Psi < -\frac{1}{2}$ so that $-1 < \Psi^n < 1$.  Now,
+  if the process takes $k$ steps, then by Lam\'e's Theorem we have
+  \begin{equation*}
+    \frac{\phi^k - \Psi^k}{\sqrt{5}} = \fib(k) \leq n,
+  \end{equation*}
+  so that rearranging terms yields
+  \begin{align*}
+    \phi^k &\leq \sqrt{5} n - \Psi^k \\
+           &\leq \sqrt{5} n + 1 \\
+           &\leq 2\sqrt{5} n,
+  \end{align*}
+  from which it follows that
+  \begin{equation*}
+    k \leq \frac{ \log n }{ \log\phi } + \frac{ 2\sqrt{5} }{ \log\phi }.
+  \end{equation*}
+  Since we can choose a value for $M$ (say by letting $M = 2$, for example) such
+  that for large values of $n$ then $M \log n$ is larger than the right-hand
+  side of the previous inequality, we conclude that the number of steps $k$ of
+  Euclid's algorithm has complexity $\mathcal{O}(\log n)$.
+\end{proof}
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
