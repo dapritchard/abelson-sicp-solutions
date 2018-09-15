@@ -17,9 +17,6 @@
 
 ;; test if `n` is a prime number, since by definition if the smallest divisor of
 ;; a number (other than 1) is itself, then the number is prime.
-
-  We can test whether a number is prime as
-;; follows: n is prime if and only if n is its own smallest divisor.
 (define (prime? n)
   (= n (smallest-divisor n)))
 
