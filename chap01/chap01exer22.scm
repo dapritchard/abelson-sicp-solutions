@@ -126,6 +126,8 @@
 	  (search-for-primes-odd range-start range-end))))
 
 
+
+
 ;; compare runtimes for various numbers ----------------------------------------
 
 ;; find the third smallest prime number starting at the following values
@@ -144,7 +146,7 @@
 
 ;; runtime output --------------------------------------------------------------
 
-;; average runtimes for the various problem sizes (in milliseconds?).  See the
+;; average runtimes for the various problem sizes (in microseconds?).  See the
 ;; computing systems specs after the runtimes.
 ;;
 ;;     size  ave. time  ratio
