@@ -1,0 +1,41 @@
+*Exercise 1.25:* Alyssa P. Hacker complains that we went to a lot of extra work
+in writing `expmod'.  After all, she says, since we already know how to compute
+exponentials, we could have simply written
+
+     (define (expmod base exp m)
+       (remainder (fast-expt base exp) m))
+
+Is she correct?  Would this procedure serve as well for our fast prime tester?
+Explain.
+
+--------------------------------------------------------------------------------
+
+
+The problem is that calculating `base^exp` will result in truly massive numbers.
+Scheme is capable performing arbitrary-precision arithmetic, but the cost to
+perform such calculations grows in complexity with the size of the number.
+
+In more detail, to implement arbitrary-precision arithmetic, values are
+represented using blocks of memory.  For example, on a 64-bit architecture, you
+could represent an unsigned number as large as 2^128 - 1 by letting the first 64
+bits represent the smaller part of the number and the second 64 bits represent
+the larger part of the number.  Then arithmetic can be done in software, using
+algorithms to operate on the number as a whole.  The concept is then easily
+extended to an arbitrary size.
+
+Thus for problems like ours where we have to perform various operations on
+massive numbers during the course of the `fast-expt` algorithm, it is likely
+that these calculations will be quite expensive.  Instead, the strategy that is
+taken is to perform the modulus operation at each intermediate step, which has
+the effect that no term is ever larger than `base * m` or `square * m`.
+
+Recall the original definition of `expod` below.
+
+     (define (expmod base exp m)
+       (cond ((= exp 0) 1)
+             ((even? exp)
+              (remainder (square (expmod base (/ exp 2) m))
+                         m))
+             (else
+              (remainder (* base (expmod base (- exp 1) m))
+                         m))))
