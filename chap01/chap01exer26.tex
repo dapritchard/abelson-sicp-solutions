@@ -1,0 +1,172 @@
+\documentclass{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage[x11names]{xcolor}
+\usepackage{nicefrac}
+
+% define a global font for listings environments
+\lstset{basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont}
+
+% define a listings environment for Scheme
+\lstdefinestyle{scheme}{%
+frame=lines,
+language=lisp,
+basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont,
+keywordstyle=\color{Blue1},
+commentstyle=\color{DarkOrchid4},
+morekeywords={define, if},
+deletekeywords={count, gcd, exp}
+}
+
+% new theorem-like environment
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+
+\DeclareMathOperator{\GCD}{GCD}
+\DeclareMathOperator{\fib}{Fib}
+
+
+
+
+\begin{document}
+
+
+% question ---------------------------------------------------------------------
+
+\noindent \textbf{Exercise 1.26:} Louis Reasoner is having great difficulty
+doing Exercise 1.24.  His \lstinline{fast-prime?} test seems to run more slowly
+than his \lstinline{prime?} test.  Louis calls his friend Eva Lu Ator over to
+help.  When they examine Louis's code, they find that he has rewritten the
+\lstinline{expmod} procedure to use an explicit multiplication, rather than
+calling \lstinline{square} as follows. \vspace{1mm}
+
+\begin{lstlisting}[style=scheme]
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)
+        ((even? exp)
+         (remainder (* (expmod base (/ exp 2) m)
+                       (expmod base (/ exp 2) m))
+                    m))
+        (else (remainder (* base (expmod base (- exp 1) m))
+                         m))))
+\end{lstlisting}
+``I don't see what difference that could make,'' says Louis.  ``I do,'' says
+Eva.  ``By writing the procedure like that, you have transformed the
+$\Theta(\log n)$ process into a $\Theta(n)$ process.''  Explain.
+
+\vspace{3mm}
+\hrule
+\vspace{5mm}
+
+A cursory examination shows that when the input to \lstinline{exp} is even, then
+this modification causes there to be two recursive calls to \lstinline{expmod}
+as opposed to one call in the original version.  Thus our task is to asses the
+complexity of this new procedure call graph.
+
+For this analysis we will need to make use of the fact that the complexity of
+each call to \lstinline{expmod} is a constant-time operation for fixed values of
+\lstinline{base} and \lstinline{m}.  In general, the complexity for any call to
+\lstinline{expmod} is a function of the magnitude of the value returned from the
+recursive call(s) to \lstinline{exmod} (recall a related discussion of this
+issue in Exercise 1.25).  Since this value is guaranteed to be less than
+\lstinline{m}, we can establish an upper bound on the complexity of any call to
+\lstinline{expmod} in call graph.
+
+Thus, based on the above discussion, we can base our cost analysis on the total
+number of calls to \lstinline{expmod} as a function of the value of
+\lstinline{exp}.  Let $f$ be a function that maps the value of \lstinline{exp}
+to the number of total calls \lstinline{expmod} required to calculate the
+result.  So for example, $f(2)$ requires an initial call to \lstinline{expmod}
+with a value of 2 as input for \lstinline{exp}, which calls two instances of
+\lstinline{expmod} each with a value of 1 as input for \lstinline{exp}, each of
+which in turn calls an instance of \lstinline{expmod} with a value of 0 as input
+for \lstinline{exp}, for a total of 5 calls to \lstinline{expmod}.  Thus, we can
+express this same call graph as
+$f(2) = 1 + 2 f(1) = 1 + 2(1 + f(0)) = 1 + 2(1 + 1) = 5$.
+
+Next, we will establish two propositions that will help to calculate the runtime
+complexity.  The intuition for Proposition \ref{thm:f-powers-of-two} is that
+when the initial input for \lstinline{exp} to \lstinline{expmod} is a power of
+2, let's say $2^k$, then it takes $2^{k + 1} - 1$ calls to \lstinline{expmod} to
+reduce the call graph to only calls with inputs of 1 for \lstinline{exp}, and
+then another $2^k$ calls to \lstinline{expmod} with 0 as an input for
+\lstinline{exp}, giving us a total of $2^{k + 1} - 1 + 2^k = 3 \cdot 2^k - 1$
+calls.
+
+\begin{proposition}
+  \label{thm:f-powers-of-two}
+  Let $k$ be a nonnegative integer.  Then $f(2^k) = 3 \cdot 2^k - 1$.
+\end{proposition}
+
+\begin{proof}
+  We proceed with proof-by-induction.  The base case is true since
+  $f(2^0) = f(1) = 2 = 3 \cdot 2^0 - 1$.
+
+  Next, for the induction step, assume that the claim is true for some value
+  $k$.  Then
+  \begin{equation*}
+    f(2^{k + 1})
+    = 1 + 2f(2^{k + 1} /\, 2)
+    = 1 + 2f(2^k)
+    = 1 + 2 \left[3 \cdot 2^k - 1 \right]
+    = 3 \cdot 2^{k + 1} - 1,
+  \end{equation*}
+  which completes the proof.
+\end{proof}
+
+\begin{proposition}
+  Let $k$ be a nonnegative integer.  Then for any nonnegative integer $n$ with
+  $n < 2^k$, it follows that $f(n) < f(2^{k + 1}) - 1$.
+\end{proposition}
+
+\begin{proof}
+  We proceed with proof-by-induction.  For the base case, let $k = 0$.  Then
+  $2^0 = 1$, so we have to establish the result for $n = 0$.  This is true since
+  $f(0) = 1 < 4 = (3 \cdot 2^{0 + 1} - 1) - 1$.
+
+  Next, assume that the claim holds for some value $k$, and let $n < 2^{k + 1}$.
+  We consider two cases.  First, suppose that $n$ is even.  Then since
+  $\frac{n}{2} < 2^k$, it follows from the induction hypothesis that
+  \begin{equation*}
+    f(n)
+    = 1 + 2 f(n/2)
+    < 1 + 2 \left[ f(2^{k + 1}) - 1 \right]
+    = 1 + 2\left[ (3 \cdot 2^{k + 1} - 1) - 1 \right]
+    = f(2^{k + 2}) - 2.
+  \end{equation*}
+  Now, suppose that $n$ is odd.  Then, using the previous result for even values
+  of $n$, we have
+  \begin{equation*}
+    f(n)
+    = 1 + f(n - 1)
+    < 1 + \left[ f(2^{k + 2}) - 2 \right]
+    = f(2^{k + 2}) - 1
+    % = 1 + 2 f\big( (n - 1) / 2 \big)
+    % \leq 1 + 2 \left[ f(2^{k + 1}) - 1 \right]
+    % = 1 + 2\left[ 3 \cdot 2^k - 1 \right]
+    % = f(2^{k + 1}),
+  \end{equation*}
+  which completes the proof,
+\end{proof}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

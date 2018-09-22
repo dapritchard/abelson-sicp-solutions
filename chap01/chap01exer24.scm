@@ -162,5 +162,5 @@
 ;;   1e500  0.23   2.56
 ;;  1e1000  1.25   5.46
 ;;
-;; this limited amount of data does seem to bear out that the procedure is
+;; this limited amount of data does seem to support that the procedure is
 ;; running in logarithmic time
