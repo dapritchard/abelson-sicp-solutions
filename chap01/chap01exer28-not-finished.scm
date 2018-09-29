@@ -59,6 +59,7 @@
 ;; conditionally computes `base^exp mod m`, unless a nontrivial square root of 1
 ;; modulo `n` is found by any recursive call to `square-check-modulo` along the
 ;; way, in which case a sentinal value of 0 is returned.
+
 ;;
 ;; a nontrivial square root of 1 modulo `n` is defined to be any value, say `x`,
 ;; such that `x^2 mod m = 1` with the exception of `x = 1` or `x = m - 1`.
@@ -110,23 +111,47 @@
 
 ;; the first 13 natural numbers
 (miller-rabin-prime? 1)
-(miller-rabin-prime? 2)
+(miller-rabin-prime? 2)  ;; <-- false negative
 (miller-rabin-prime? 3)
 (miller-rabin-prime? 4)
 (miller-rabin-prime? 5)
-(miller-rabin-prime? 6)
+(miller-rabin-prime? 6)  ;; <-- false positive
 (miller-rabin-prime? 7)
 (miller-rabin-prime? 8)
 (miller-rabin-prime? 9)
-(miller-rabin-prime? 10)
+(miller-rabin-prime? 10)  ;; <-- false positive
 (miller-rabin-prime? 11)
 (miller-rabin-prime? 12)
 (miller-rabin-prime? 13)
 
-;; the first 6 Carmichael numbers
-(exhaustive-fermat  561)
-(exhaustive-fermat 1105)
-(exhaustive-fermat 1729)
-(exhaustive-fermat 2465)
-(exhaustive-fermat 2821)
-(exhaustive-fermat 6601)
+;; the first 6 Carmichael numbers (i.e these are non-primes)
+(miller-rabin-prime?  561)
+(miller-rabin-prime? 1105)
+(miller-rabin-prime? 1729)
+(miller-rabin-prime? 2465)
+(miller-rabin-prime? 2821)
+(miller-rabin-prime? 6601)
+
+;; these are all prime numbers
+(miller-rabin-prime? 103991)
+(miller-rabin-prime? 103993)
+(miller-rabin-prime? 103997)
+(miller-rabin-prime? 104003)
+(miller-rabin-prime? 104009)
+(miller-rabin-prime? 104021)
+(miller-rabin-prime? 104033)
+(miller-rabin-prime? 104047)
+(miller-rabin-prime? 104053)
+(miller-rabin-prime? 104059)
+
+;; these are all non-prime numbers
+(miller-rabin-prime? 103992)
+(miller-rabin-prime? 103994)
+(miller-rabin-prime? 103998)
+(miller-rabin-prime? 104004)
+(miller-rabin-prime? 104010)
+(miller-rabin-prime? 104022)
+(miller-rabin-prime? 104034)
+(miller-rabin-prime? 104048)
+(miller-rabin-prime? 104054)  ;; <-- false positive
+(miller-rabin-prime? 104060)
