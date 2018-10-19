@@ -18,6 +18,8 @@
 
 ;; define `prime?` (see Exercise 1.22) -----------------------------------------
 
+;; driver function to call the recursive `find-driver` function with starting
+;; seed of 2 (i.e the first number to check against `n` as a divisor)
 (define (smallest-divisor n)
   (find-divisor n 2))
 
@@ -44,6 +46,7 @@
 
 ;; create filtered accumulate fcn ----------------------------------------------
 
+;;
 (define (filtered-accumulate combiner keep? null-value term a next b)
   (if (> a b)
       null-value
@@ -66,11 +69,39 @@
 
 ;; part a ----------------------------------------------------------------------
 
+;; calculate the square of `x`
 (define (square x) (* x x))
-(define (sum-prime-squares a b)
-  (filtered-accumulate + prime? 0 square a 1+ b))
+
+
+;; calculate \sum_{i = a}^{b} I(i is prime) * a^2
 (define (sum-prime-squares-iter a b)
   (filtered-accumulate-iter + prime? 0 square a 1+ b))
+
+
+
+
+;; part b ----------------------------------------------------------------------
+
+;; obtain the greatest common denominator of integers `a` and `b`.  See Section
+;; 1.2.5.
+(define (gcd a b)
+  (if (= b 0)
+      a
+      (gcd b (remainder a b))))
+
+
+;; check if `a` and `b` are relatively prime, (i.e if GCD(a, b) = 1).
+(define (rel-prime? a b)
+  (= 1 (gcd a b)))
+
+
+;; calculate the product of all the positive integers less than n that are
+;; relatively prime to n (i.e., all positive integers i < n such that GCD(i,n) =
+;; 1).
+(define (prod-rel-prime n)
+  (define (rel-prime-to-n? k)
+    (rel-prime? k n))
+  (filtered-accumulate-iter * rel-prime-to-n? 1 identity 1 1+ n))
 
 
 
