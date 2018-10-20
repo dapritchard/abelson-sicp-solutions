@@ -1,0 +1,155 @@
+\documentclass{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage[x11names]{xcolor}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+
+% define a global font for listings environments
+\lstset{basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont}
+
+% define a listings environment for Scheme
+\lstdefinestyle{scheme}{%
+  frame=lines,
+  language=lisp,
+  basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont,
+  keywordstyle=\color{Blue1},
+  commentstyle=\color{DarkOrchid4},
+  morekeywords={define, if},
+  deletekeywords={count, gcd}
+}
+
+% redefine section headers size
+\titleformat{\section}[hang]
+{\bfseries}
+{}
+{0em}
+{}
+% section and subsection spacing
+\titlespacing*{\section}{0pt}{10mm plus 1ex minus .2ex}{4mm plus .2ex}
+
+
+
+
+\begin{document}
+
+% question ---------------------------------------------------------------------
+
+\noindent \textbf{Exercise 1.35:} Show that the golden ratio $\phi$ (see Section
+1.2.2) is a fixed point of the transformation $x \mapsto 1 + 1/x$, and use this
+fact to compute $\phi$ by means of the \lstinline{fixed-point} procedure.
+
+\noindent \hrulefill
+
+
+
+\section{Fixed points of functions}
+
+A number $x$ is called a \emph{fixed point} of a function $f$ if $x$ satisfies
+the equation $f(x) = x$.  Graphically, these are exactly those points where the
+graph of $f$, whose equation is $y = f(x)$, crosses the diagonal, whose equation
+is $y = x$.  Clearly, a function might not have any fixed points, or it may have
+one or more fixed points.
+
+It turns out that for some choices of $f$ and a starting point $x_0$, that
+repeated applications of $f$ to $x_0$ will converge to a fixed point.  Formally,
+if we define $x_k = f(x_{k - 1})$ for such a choice of $f$ and
+$k = 1, 2, \dots$, then $\lim_{k \rightarrow \infty} x_k = x^{*}$ for some fixed
+point $x^{*}$.  Thus we can think of fixed points as ``points of stability'' for
+a given model.  For example if the amount of bacteria in a given organism grows
+and shrinks over time according to such a function, then this quantity will
+eventually converge to a stable value.
+
+It can be shown (c.f.\
+\url{http://math.mit.edu/classes/18.01/F2011/lecture3.pdf} or
+\url{https://en.wikipedia.org/wiki/Fixed_point_(mathematics)}) that if $f$ is
+continuously differentiable in an open neighbourhood of a fixed point $x^{*}$,
+and $|f^{\prime}(x^{*})| < 1$, then for a starting point $x_0$ close enough to
+$x^{*}$ then repeated application of $f$ to $x_0$ will converge to $x^{*}$.
+Conversely, if $|f^{\prime}(x^{*})| > 1$, then repeated application of $f$ to
+$x_0$ will \emph{not} converge to $x^{*}$.  Functions with
+$|f^{\prime}(x^{*})| = 1$ need to be evaluated on a case-by-case basis.
+
+At the current time I'm not aware of any results for non-continuously
+differentiable functions.
+
+
+
+
+\section{Showing that $\phi$ is a fixed point}
+
+\noindent Recall from Section 1.2.2 that $\phi = (1 + \sqrt{5}) / 2$.  Let us
+define a function $f: \mathbb{R} \mapsto \mathbb{R}$ with $f(x) = 1 + 1 / x$.
+Then we have
+\begin{align*} \MoveEqLeft
+  f(\phi) = 1 + \left( \frac{1 + \sqrt{5}}{2} \right)^{-1} \\
+  &= 1 + \frac{2}{1 + \sqrt{5}} \\[1ex]
+  &= \frac{3 + \sqrt{5}}{1 + \sqrt{5}} \\[1ex]
+  &= \frac{3 + \sqrt{5}}{1 + \sqrt{5}} \,\cdot \frac{1 - \sqrt{5}}{1 - \sqrt{5}} \\[1ex]
+  &= \frac{1 + \sqrt{5}}{2}
+\end{align*}
+
+
+
+
+\section{Numerically calculating the value of $\phi$}
+
+Let us define $f$ to be the function given in the prompt (i.e.
+$f(x) = (1 + 1/x)$), then we note that $f^{\prime}(x) = -1 / x^2$.  Since the
+absolute value of $f^{\prime}(x)$ is less than 1 for values of $x$ in an open
+interval around $\phi$, it follows that repeated applications of this $f$ will
+converge to $phi$ for starting values close enough to $\phi$.
+
+The following code sets up the fixed point procedure and function to be
+evaluated, and approximates $\phi$ using several different starting points.
+
+\vspace{2mm}
+\begin{lstlisting}[style=scheme]
+;; a measure of closeness to be used as a parameter for defining when
+;; convergence has occurred
+(define tolerance 0.00001)
+
+
+;; search for a fixed point for the function `f`, starting with the value of
+;; `first-guess`.  Note that this function should probably have a stopping
+;; criterion for function / value pairs for which onvergence does not occur.
+(define (fixed-point f first-guess)
+  (define (close-enough? v1 v2)
+    (< (abs (- v1 v2)) tolerance))
+  (define (try guess)
+    (let ((next (f guess)))
+      (if (close-enough? guess next)
+          next
+          (try next))))
+  (try first-guess))
+
+
+;; define the function given in the prompt
+(define (f x)
+  (+ 1 (/ 1 x)))
+
+
+;; each of these starting points converges to phi, so for this problem the
+;; starting value need not need to be close at all to the fixed point to achieve
+;; convergence
+(fixed-point f     2.0)
+(fixed-point f  1000.0)
+(fixed-point f -1000.0)
+\end{lstlisting}
+
+
+
+\end{document}
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
