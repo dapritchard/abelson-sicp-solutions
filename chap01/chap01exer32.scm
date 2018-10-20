@@ -22,6 +22,11 @@
 
 ;; part a (linear version) -----------------------------------------------------
 
+;; linear version.  Takes the functions `combiner`, `term`, and `next`, and
+;; values `null-value`, `a`, and `b` as inputs.  Return value is the result of
+;; applying `combiner` to the values of `term` evaluated at successive values of
+;; `next` applied to `a`, with the sum ending when the value of `(next (next
+;; ... (next a)...))` is larger than `b`.
 (define (accumulate combiner null-value term a next b)
   (if (> a b)
       null-value
@@ -33,11 +38,16 @@
 
 ;; part b (iterative version) --------------------------------------------------
 
+;; iterative version.  Takes the functions `combiner`, `term`, and `next`, and
+;; values `null-value`, `a`, and `b` as inputs.  Return value is the result of
+;; applying `combiner` to the values of `term` evaluated at successive values of
+;; `next` applied to `a`, with the sum ending when the value of `(next (next
+;; ... (next a)...))` is larger than `b`.
 (define (accumulate-iter combiner null-value term a next b)
   (define (iter a result)
     (if (> a b)
-       result
-       (iter (next a) (combiner result (term a)))))
+	result
+	(iter (next a) (combiner result (term a)))))
   (iter a null-value))
 
 

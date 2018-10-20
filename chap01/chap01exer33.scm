@@ -34,6 +34,7 @@
 (define (prime? n)
   (= n (smallest-divisor n)))
 
+
 ;; returns the smallest divisor of `n` that is greater than or equal to than
 ;; `test-divisor`
 (define (find-divisor n test-divisor)
@@ -46,7 +47,11 @@
 
 ;; create filtered accumulate fcn ----------------------------------------------
 
-;;
+;; linear version.  Takes the functions `combiner`, `keep?`, `term`, and `next`,
+;; and values `null-value`, `a`, and `b` as inputs.  Return value is the result
+;; of applying `combiner` to the values of `term` evaluated at successive values
+;; of `next` applied to `a` and filtered by the result of `keep`, with the sum
+;; ending when the value of `(next (next ... (next a)...))` is larger than `b`.
 (define (filtered-accumulate combiner keep? null-value term a next b)
   (if (> a b)
       null-value
@@ -56,6 +61,12 @@
 		(filtered-accumulate combiner keep? null-value term (next a) next b))))
 
 
+;; iterative version.  Takes the functions `combiner`, `keep?`, `term`, and
+;; `next`, and values `null-value`, `a`, and `b` as inputs.  Return value is the
+;; result of applying `combiner` to the values of `term` evaluated at successive
+;; values of `next` applied to `a` and filtered by the result of `keep`, with
+;; the sum ending when the value of `(next (next ... (next a)...))` is larger
+;; than `b`.
 (define (filtered-accumulate-iter combiner keep? null-value term a next b)
   (define (iter a result)
    (if (> a b)

@@ -21,8 +21,8 @@
 ;; part a (linear version) -----------------------------------------------------
 
 ;; linear version.  Takes the functions `term` and `next` and values `a` and `b`
-;; as inputs.  Return value is the product of the values of of `term` evaluated
-;; at successive values of `next` applied to `a`, with the sum ending when the
+;; as inputs.  Return value is the product of the values of `term` evaluated at
+;; successive values of `next` applied to `a`, with the sum ending when the
 ;; value of `(next (next ... (next a)...))` is larger than `b`.
 (define (product term a next b)
   (if (> a b)
@@ -36,9 +36,9 @@
 ;; part b (iterative version) --------------------------------------------------
 
 ;; iterative version.  Takes the functions `term` and `next` and values `a` and
-;; `b` as inputs.  Return value is the product of the values of of `term`
-;; evaluated at successive values of `next` applied to `a`, with the sum ending
-;; when the value of `(next (next ... (next a)...))` is larger than `b`.
+;; `b` as inputs.  Return value is the product of the values of `term` evaluated
+;; at successive values of `next` applied to `a`, with the sum ending when the
+;; value of `(next (next ... (next a)...))` is larger than `b`.
 (define (product-iter term a next b)
   (define (iter a result)
     (if (> a b)
@@ -51,15 +51,18 @@
 
 ;; test cases ------------------------------------------------------------------
 
+;; identity function
 (define (identity x) x)
 
 
+;; factorial function using `product`
 (define (factorial n)
   (if (<= n 1)
       1
       (product identity 2 1+ n)))
 
 
+;; factorial function using `product-iter`
 (define (factorial-iter n)
   (if (<= n 1)
       1
