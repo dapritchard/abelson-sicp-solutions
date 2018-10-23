@@ -88,7 +88,7 @@
 
 % deriving the form for phi ----------------------------------------------------
 
-\section{Continued fraction expression for $\boldsymbol{\phi}$}
+\section{Continued fraction expression for $1 / \phi$}
 
 Recall from Section 1.2.2 that $\phi^2 = \phi + 1$.  If we divide both sides by
 $\phi$, then we obtain $\phi = 1 + \frac{1}{\phi}$.  Recursively replacing
@@ -97,35 +97,134 @@ $\phi$ in the denominator of the right-hand side yields
   1 + \frac{1}{\phi} = 1 + \frac{1}{
     1 + \frac{1}{\phi}},
 \end{equation*}
-which of course simplifies to
+which then simplifies to
 \begin{equation*}
   \frac{1}{\phi} = \frac{1}{
     1 + \frac{1}{\phi}}.
 \end{equation*}
-Again recursively replacing $\phi$ on the right-hand side yields
+Once again replacing $\phi$ on the right-hand side yields
 \begin{equation*}
   \frac{1}{\phi} = \frac{1}{
     1 + \frac{1}{
       1 + \frac{1}{\phi}}},
 \end{equation*}
-and so on.  We can use proof-by-induction to establish that $N_k = D_k = 1$ for
-arbitrary $k$ in the continued fraction expression, as claimed in the prompt.
+and we can continue to do this indefinitely.  We can use proof-by-induction to
+establish that $N_k = D_k = 1$ for arbitrary $k$ in the continued fraction
+expression, as claimed in the prompt.
 
 
 
 
-% \section{Showing that $\phi$ is a fixed point}
+% part a (recursive version) ---------------------------------------------------
 
-% \noindent Recall from Section 1.2.2 that $\phi = (1 + \sqrt{5}) / 2$.  Let us
-% define a function $f: \mathbb{R} \mapsto \mathbb{R}$ with $f(x) = 1 + 1 / x$.
-% Then we have
-% \begin{align*} \MoveEqLeft
-%   f(\phi) = 1 + \left( \frac{1 + \sqrt{5}}{2} \right)^{-1} \\
-%   &= 1 + \frac{2}{1 + \sqrt{5}} \\[1ex]
-%   &= \frac{3 + \sqrt{5}}{1 + \sqrt{5}} \\[1ex]
-%   &= \frac{3 + \sqrt{5}}{1 + \sqrt{5}} \,\cdot \frac{1 - \sqrt{5}}{1 - \sqrt{5}} \\[1ex]
-%   &= \frac{1 + \sqrt{5}}{2}
-% \end{align*}
+\section{Creating a recursive version of the $k$-term finite continued fraction}
+
+We can either count up starting from 1 towards $k$ or count down starting from
+$k$ towards 1.  It turns out that starting from 1 and counting up naturally
+leads to a recursive version.
+
+\begin{lstlisting}[style=scheme]
+;; linear version.  Calculates a k-term finite continued fraction where the
+;; values of `N_i` and `D_i` are given by evaluating `n-fcn` and `d-fcn` at i.
+;; Note that we add by 0.0 during one of the calculations to ensure the use of
+;; floating point operations (instead of fractional).
+(define (cont-frac n-fcn d-fcn k)
+  (define (i-th-level i)
+    (if (> i k)
+	0
+	(/ (n-fcn i)
+	   (+ 0.0
+	      (d-fcn i)
+	      (i-th-level (1+ i))))))
+  (i-th-level 1))
+\end{lstlisting}
+
+
+
+
+% part b (iterative version) ---------------------------------------------------
+
+\section{Creating an iterative version of the $k$-term finite continued fraction}
+
+Counting down from $k$ naturally leads to an iterative version.
+
+\begin{lstlisting}[style=scheme]
+;; iterative version.  Calculates a k-term finite continued fraction where the
+;; values of `N_i` and `D_i` are given by evaluating `n-fcn` and `d-fcn` at i.
+;; Note that we add by 0.0 during one of the calculations to ensure the use of
+;; floating point operations (instead of fractional).
+(define (cont-frac-iter n-fcn d-fcn k)
+  (define (calc-inner-term n-k d-k inner-result)
+    (/ n-k (+ 0.0 d-k inner-result)))
+  (define (i-th-level i inner-result)
+    (if (= 0 i)
+	inner-result
+	(i-th-level (1- i)
+		    (calc-inner-term (n-fcn i)
+				     (d-fcn i)
+				     inner-result))))
+  (i-th-level (1- k)
+	      (/ (n-fcn k)
+		 (d-fcn k))))
+\end{lstlisting}
+
+
+
+
+% helper functions -------------------------------------------------------------
+
+\section{Helper functions}
+
+Here we define a function \lstinline{find-first-close} for later use to measure
+how many terms are necessary to closely approximate the desired values.
+
+\begin{lstlisting}[style=scheme]
+(define MAX-ITER 1000000)
+(define (1- x) (- x 1))
+
+;; test whether the difference between `actual` and `target` is less than `eps`
+(define (close-enough? actual target eps)
+  (< (abs (- actual target)) eps))
+
+
+;; repeatedly evaluate `f`, a function that takes a single integer input, until
+;; the difference beteen the result of `f` and `target` is less than `eps`.  The
+;; values passed to `f` start at 1 and increase by 1 each time, and the return
+;; value is the number of attempts that are necessary for an evaluation clsoe to
+;; `target` is found.
+(define (find-first-close f target eps)
+  (define (try i)
+    (cond ((> i MAX-ITER) (error "sequence did not converge"))
+          ((close-enough? (f i) target eps) i)
+          (#t (try (1+ i)))))
+  (try 1))
+\end{lstlisting}
+
+
+
+
+% test cases -------------------------------------------------------------------
+
+\section{Test cases}
+
+Check that our function approximating $1 / \phi$ yields a reasonable result, and
+measure how many terms are needed to get a good approximation.
+
+\begin{lstlisting}[style=scheme]
+;; the continued fraction expression for 1 / phi
+(define (n-1-fcn i) 1)
+(define (d-1-fcn i) 1)
+(define (frac-phi-inv k)
+  (cont-frac-iter n-1-fcn d-1-fcn k))
+
+
+;; 1 / phi:  should be approximately 0.6180339887498949
+(frac-phi-inv 100)
+
+;; the size of `k` needed to approximate the value of 1 / phi to 4 decimal places
+(find-first-close frac-phi-inv 0.6180339887498949 0.00001)
+\end{lstlisting}
+
 
 
 
