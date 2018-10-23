@@ -1,0 +1,141 @@
+\documentclass{article}
+
+\usepackage[margin=3cm]{geometry}
+\usepackage[fleqn]{amsmath}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage[x11names]{xcolor}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+
+
+% define a global font for listings environments
+\lstset{basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont}
+
+% define a listings environment for Scheme
+\lstdefinestyle{scheme}{%
+  frame=lines,
+  language=lisp,
+  basicstyle=\fontsize{9.5}{10.5}\fontfamily{pcr}\selectfont,
+  keywordstyle=\color{Blue1},
+  commentstyle=\color{DarkOrchid4},
+  morekeywords={define, if},
+  deletekeywords={count, gcd}
+}
+
+% redefine section headers size
+\titleformat{\section}[hang]
+{\bfseries}
+{}
+{0em}
+{}
+% section and subsection spacing
+\titlespacing*{\section}{0pt}{10mm plus 1ex minus .2ex}{4mm plus .2ex}
+
+
+
+
+\begin{document}
+
+% question ---------------------------------------------------------------------
+
+\noindent \textbf{Exercise 1.37:}
+
+\begin{enumerate}[label=\alph*.]
+\item An infinite ``continued fraction'' is an expression of the form
+  \begin{equation*}
+    f = \frac{N_1}{
+      D_1 + \frac{N_2}{
+        D_2 + \frac{N_3}{D_3 + \dots}}}
+  \end{equation*}
+  As an example, one can show that the infinite continued fraction expansion
+  with the $N_i$ and the $D_i$ all equal to 1 produces $1/\phi$, where $\phi$ is
+  the golden ratio (described in Section 1.2.2).  One way to approximate an infinite
+  continued fraction is to truncate the expansion after a given number of terms.
+  Such a truncation -- a so-called finite continued fraction ``$k$-term finite
+  continued fraction'' -- has the form
+  \begin{equation*}
+    f_k = \frac{N_1}{
+      D_1 + \frac{N_2}{
+        \dots + \frac{N_k}{D_k}}}
+  \end{equation*}
+  Suppose that \lstinline{n} and \lstinline{d} are procedures of one argument
+  (the term index $i$) that return the $N_i$ and $D_i$ of the terms of
+  the continued fraction.  Define a procedure \lstinline{cont-frac} such that evaluating
+  \lstinline{(cont-frac n d k)} computes the value of the $k$-term finite continued
+  fraction.  Check your procedure by approximating $1/\phi$ using
+\begin{lstlisting}[style=scheme, frame=none]
+   (cont-frac (lambda (i) 1.0)
+              (lambda (i) 1.0)
+              k)
+\end{lstlisting}
+  for successive values of $k$.  How large must you make $k$ in order to
+  get an approximation that is accurate to 4 decimal places?
+
+\item If your `cont-frac` procedure generates a recursive process, write one
+  that generates an iterative process.  If it generates an iterative
+  process, write one that generates a recursive process.
+
+\end{enumerate}
+
+\noindent \hrule
+
+
+
+
+% deriving the form for phi ----------------------------------------------------
+
+\section{Continued fraction expression for $\boldsymbol{\phi}$}
+
+Recall from Section 1.2.2 that $\phi^2 = \phi + 1$.  If we divide both sides by
+$\phi$, then we obtain $\phi = 1 + \frac{1}{\phi}$.  Recursively replacing
+$\phi$ in the denominator of the right-hand side yields
+\begin{equation*}
+  1 + \frac{1}{\phi} = 1 + \frac{1}{
+    1 + \frac{1}{\phi}},
+\end{equation*}
+which of course simplifies to
+\begin{equation*}
+  \frac{1}{\phi} = \frac{1}{
+    1 + \frac{1}{\phi}}.
+\end{equation*}
+Again recursively replacing $\phi$ on the right-hand side yields
+\begin{equation*}
+  \frac{1}{\phi} = \frac{1}{
+    1 + \frac{1}{
+      1 + \frac{1}{\phi}}},
+\end{equation*}
+and so on.  We can use proof-by-induction to establish that $N_k = D_k = 1$ for
+arbitrary $k$ in the continued fraction expression, as claimed in the prompt.
+
+
+
+
+% \section{Showing that $\phi$ is a fixed point}
+
+% \noindent Recall from Section 1.2.2 that $\phi = (1 + \sqrt{5}) / 2$.  Let us
+% define a function $f: \mathbb{R} \mapsto \mathbb{R}$ with $f(x) = 1 + 1 / x$.
+% Then we have
+% \begin{align*} \MoveEqLeft
+%   f(\phi) = 1 + \left( \frac{1 + \sqrt{5}}{2} \right)^{-1} \\
+%   &= 1 + \frac{2}{1 + \sqrt{5}} \\[1ex]
+%   &= \frac{3 + \sqrt{5}}{1 + \sqrt{5}} \\[1ex]
+%   &= \frac{3 + \sqrt{5}}{1 + \sqrt{5}} \,\cdot \frac{1 - \sqrt{5}}{1 - \sqrt{5}} \\[1ex]
+%   &= \frac{1 + \sqrt{5}}{2}
+% \end{align*}
+
+
+
+
+\end{document}
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
