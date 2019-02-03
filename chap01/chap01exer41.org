@@ -12,6 +12,8 @@
 #+LaTeX_HEADER: \usepackage[x11names]{xcolor}
 #+LaTeX_HEADER: \usepackage{amsthm}
 #+LaTeX_HEADER: \usepackage{titlesec}
+#+LaTeX_HEADER: \usepackage{xpatch}
+#+LaTeX_HEADER: \usepackage{realboxes}
 #+LaTeX_HEADER: \hypersetup{linktoc = all, colorlinks = true, urlcolor = DodgerBlue4, citecolor = PaleGreen1, linkcolor = black}
 
 #+BEGIN_EXPORT latex
@@ -57,6 +59,20 @@
   \titlespacing*{\section}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
   \titlespacing*{\subsection}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
   \titlespacing*{\subsubsection}{0pt}{5mm plus 1ex minus .2ex}{2mm plus .2ex}
+
+  % see the following links for this definition:
+  %
+  %     https://tex.stackexchange.com/a/357339/88779
+  %     https://tex.stackexchange.com/q/408878
+  \makeatletter
+  \xpretocmd\lstinline
+  {%
+    \bgroup\fboxsep=1.5pt
+    \Colorbox{gray!20}\bgroup\kern-\fboxsep\vphantom{\ttfamily\char`\\y}%
+    \appto\lst@DeInit{\kern-\fboxsep\egroup\egroup}%
+  }{}{}
+  \makeatother
+
 
   % use the `scheme` listings definition
   \lstset{style=scheme}
@@ -119,16 +135,62 @@ src_scheme[:exports code]{inc}.
 
 
 
-** Discussion of the results
+** Tracing through the function call
+:PROPERTIES:
+:CUSTOM_ID: sec:function-trace
+:END:
 
 The following figure is provided to illustrate why the expression
-src_scheme[:exports code]{(((double } src_scheme[:exports code]{(double
-double))} src_scheme[:exports code]{inc) 5)} results in 16 calls to
+src_scheme[:exports code]{(((double (double double)) inc) 5)}
+results in 16 calls to
 src_scheme[:exports code]{inc}.  There are a few conventions that are used in
 the figure in an attempt to make things more clear.  Rectangles are placed
 around some constructs to indicate that they are a function when taken as a
-whole.  Additionally, unevaluated functions are sometimes indicated by using a
-dot (representing arguments) rather than as a lambda expression so as to reduce
-visual clutter and sidestep syntactic details.  So for example, rather than
-writing src_scheme[:exports code]{(lambda (x) (inc (inc x)))}, we might write
-src_scheme[:exports code]{(inc (inc }$\bullet$ src_scheme[:exports code]{))}.
+whole.  Additionally, functions that are used as arguments or lambda expression
+constructs are sometimes indicated by using a $\bullet$ (representing arguments)
+rather than as a valid Scheme expression so as to reduce visual clutter and
+sidestep syntactic details.
+# So for example, rather than writing
+# src_scheme[:exports code]{(lambda (x) (inc (inc x)))}, we might write
+# src_scheme[:exports code]{(inc (inc } $\bullet$ src_scheme[:exports code]{))}.
+
+We start with the original expression in Step 1, and in Step 2 we evaluate the
+expression src_scheme[:exports code]{(double double)} (using our $\bullet$
+notation), creating a new function that we denote by surrounding it with a
+rectangle.  Then in Step 3 we evaluate the outermost call to src_scheme[:exports
+code]{double}, creating a new function that is composed of the two functions
+denoted by the inner rectangular boxes.
+
+Next, in Step 4 we begin to thread the input argument src_scheme[:exports
+code]{inc} into our newly created function.  While the ordering depends on the
+implementation of the interpreter, at some point the src_scheme[:exports
+code]{inc} argument will make its way all the way to the innermost call to
+src_scheme[:exports code]{double}, which is the step that is shown here as the
+innermost rectangle in the right-hand term.
+
+Next, in Step 5 the newly created function is passed to the next call to
+src_scheme[:exports code]{double}.  Then in Step 6 we can pass this entire
+function to the next call to src_scheme[:exports code]{double} creating yet
+another function, which can then be passed to the outermost call to
+src_scheme[:exports code]{double} in Step 7.
+
+#+BEGIN_EXPORT latex
+\begin{figure}[htb]
+  \caption{A visual trace of the function call from Exercise 1.41.}
+  \vspace{3mm}
+  \includegraphics[width=1\textwidth]{figures/chap01exer41-callgraph.pdf}
+\end{figure}
+#+END_EXPORT
+
+
+
+
+** Discussion of the results
+
+To see why having $n$ instances of src_scheme[:exports code]{double} causes
+there to be $2^{2^{n-1}}}$ calls to src_scheme[:exports code]{inc}, we again
+refer to [[#sec:function-trace]] as an illustration.  Firstly, in Steps 1-3 we see
+that $2^{n-1}$ calls to src_scheme[:exports code]{double} are created.  Then in
+Steps 4-7 we see that each call to src_scheme[:exports code]{double} generates
+twice as many calls to the input function as in the previous step, resulting in
+the expression $2^{2^{n-1}}}$.
