@@ -1,0 +1,134 @@
+#+TITLE: SICP Exercise 1.41
+
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: num:nil
+#+OPTIONS: html-postamble:nil
+#+STARTUP: showeverything
+#+PROPERTY: :tangle yes
+
+#+LaTeX_HEADER: \usepackage[margin=1in]{geometry}
+#+LaTeX_HEADER: \usepackage[x11names]{xcolor}
+#+LaTeX_HEADER: \usepackage{amsthm}
+#+LaTeX_HEADER: \usepackage{titlesec}
+#+LaTeX_HEADER: \hypersetup{linktoc = all, colorlinks = true, urlcolor = DodgerBlue4, citecolor = PaleGreen1, linkcolor = black}
+
+#+BEGIN_EXPORT latex
+  % remove excess whitespace after \maketitle command
+  \vspace{-20mm}
+#+END_EXPORT
+
+#+BEGIN_EXPORT latex
+  % background color for code environments
+  \definecolor{lightyellow}{RGB}{255,255,224}
+  \definecolor{lightbrown}{RGB}{249,234,197}
+
+  \lstset{%
+    basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont
+  }
+
+  % create a listings environment for Bash
+  \lstdefinestyle{scheme}{%
+    language=lisp,
+    backgroundcolor=\color{lightyellow},
+    basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont,
+    keywordstyle=\color{Firebrick3},
+    stringstyle=\color{Green4},
+    commentstyle=\color{Purple3},
+    showstringspaces=false,
+    morecomment=[l]{userid@},
+    morecomment=[l]{onyenid@},
+    morecomment=[l]{localid@},
+    morecomment=[l]{sftp> },
+    moredelim=[is][\bfseries]{[*@}{@*]},
+    framesep=20pt,
+    framexleftmargin=5pt,
+    framextopmargin=20pt,
+    framexrightmargin=5pt,
+    framexbottommargin=20pt
+  }
+
+  % titlesec documentation:
+  % http://ctan.mackichan.com/macros/latex/contrib/titlesec/titlesec.pdf
+
+  % see pgs 4-5 of documentation for titlespacing syntax.  The command signature
+  % is: \titlespacing*{<command>}{<left>}{<before-sep>}{<after-sep>}[<right-sep>]
+  \titlespacing*{\section}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
+  \titlespacing*{\subsection}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
+  \titlespacing*{\subsubsection}{0pt}{5mm plus 1ex minus .2ex}{2mm plus .2ex}
+
+  % use the `scheme` listings definition
+  \lstset{style=scheme}
+#+END_EXPORT
+
+
+
+
+* Exercise 1.41
+
+Define a procedure src_scheme[:exports code]{double} that takes a procedure of
+one argument as an argument and returns a procedure that applies the original
+procedure twice.  For example, if src_scheme[:exports code]{inc} is a procedure
+that adds 1 to its argument, then src_scheme[:exports code]{(double inc)} should
+be a procedure that adds 2.  What value is returned by the following expression?
+
+#+BEGIN_SRC scheme
+  (((double (double double)) inc) 5)
+#+END_SRC
+
+
+
+
+* Solution
+
+** Definition of =double=
+
+We define the function src_scheme[:exports code]{double} as follows.
+#+BEGIN_SRC scheme
+  ;; takes an input function `f` and returns a function that takes an input and
+  ;; applies `f` to it twice
+  (define (double f)
+    (lambda (x)
+      (f (f x))))
+#+END_SRC
+
+
+
+** Example usage
+
+A few examples using src_scheme[:exports code]{double} are shown below.  We can see from the pattern that
+having $n$ instances of src_scheme[:exports code]{double} causes there to be $2^{2^{n-1}}}$ calls to
+src_scheme[:exports code]{inc}.
+#+BEGIN_SRC scheme
+  ;; define `inc`
+  (define (inc x) (1+ x))
+
+  ;; evaluates to the values 1, 2, 4, 16, 256, 65536
+  (inc 0)
+  ((double inc) 0)
+  (((double double) inc) 0)
+  (((double (double double)) inc) 0)
+  (((double (double (double double))) inc) 0)
+  (((double (double (double (double double)))) inc) 0)
+
+  ;; evaluates to the value 21
+  (((double (double double)) inc) 5)
+#+END_SRC
+
+
+
+
+** Discussion of the results
+
+The following figure is provided to illustrate why the expression
+src_scheme[:exports code]{(((double } src_scheme[:exports code]{(double
+double))} src_scheme[:exports code]{inc) 5)} results in 16 calls to
+src_scheme[:exports code]{inc}.  There are a few conventions that are used in
+the figure in an attempt to make things more clear.  Rectangles are placed
+around some constructs to indicate that they are a function when taken as a
+whole.  Additionally, unevaluated functions are sometimes indicated by using a
+dot (representing arguments) rather than as a lambda expression so as to reduce
+visual clutter and sidestep syntactic details.  So for example, rather than
+writing src_scheme[:exports code]{(lambda (x) (inc (inc x)))}, we might write
+src_scheme[:exports code]{(inc (inc }$\bullet$ src_scheme[:exports code]{))}.
