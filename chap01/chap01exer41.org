@@ -5,6 +5,8 @@
 #+OPTIONS: toc:nil
 #+OPTIONS: num:nil
 #+OPTIONS: html-postamble:nil
+#+OPTIONS: html-style:nil
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="github-pandoc.css" />
 #+STARTUP: showeverything
 #+PROPERTY: :tangle yes
 
@@ -97,8 +99,14 @@ be a procedure that adds 2.  What value is returned by the following expression?
 
 
 * Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
 
 ** Definition of =double=
+:PROPERTIES:
+:CUSTOM_ID: double-definition
+:END:
 
 We define the function src_scheme[:exports code]{double} as follows.
 #+BEGIN_SRC scheme
@@ -112,6 +120,9 @@ We define the function src_scheme[:exports code]{double} as follows.
 
 
 ** Example usage
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
 
 A few examples using src_scheme[:exports code]{double} are shown below.  We can see from the pattern that
 having $n$ instances of src_scheme[:exports code]{double} causes there to be $2^{2^{n-1}}}$ calls to
@@ -137,19 +148,18 @@ src_scheme[:exports code]{inc}.
 
 ** Tracing through the function call
 :PROPERTIES:
-:CUSTOM_ID: sec:function-trace
+:CUSTOM_ID: function-trace
 :END:
 
 The following figure is provided to illustrate why the expression
-src_scheme[:exports code]{(((double (double double)) inc) 5)}
-results in 16 calls to
-src_scheme[:exports code]{inc}.  There are a few conventions that are used in
-the figure in an attempt to make things more clear.  Rectangles are placed
-around some constructs to indicate that they are a function when taken as a
-whole.  Additionally, functions that are used as arguments or lambda expression
-constructs are sometimes indicated by using a $\bullet$ (representing arguments)
-rather than as a valid Scheme expression so as to reduce visual clutter and
-sidestep syntactic details.
+src_scheme[:exports code]{(((double (double double)) inc) 5)} results in 16
+calls to src_scheme[:exports code]{inc}.  There are a few conventions that are
+used in the figure in an attempt to make things more clear.  Rectangles are
+placed around some constructs to indicate that they are a function when taken as
+a whole.  Additionally, functions that are used either as arguments or as lambda
+expression constructs are sometimes indicated by using a $\bullet$ (representing
+arguments) rather than as a valid Scheme expression so as to reduce visual
+clutter and sidestep syntactic details.
 # So for example, rather than writing
 # src_scheme[:exports code]{(lambda (x) (inc (inc x)))}, we might write
 # src_scheme[:exports code]{(inc (inc } $\bullet$ src_scheme[:exports code]{))}.
@@ -182,14 +192,29 @@ src_scheme[:exports code]{double} in Step 7.
 \end{figure}
 #+END_EXPORT
 
+#+BEGIN_EXPORT html
+  <style>
+  .aligncenter {
+      text-align: center;
+  }
+  </style>
+
+  <p class="aligncenter">
+    <img src="figures/chap01exer41-callgraph.svg" align="middle" />
+  </p>
+#+END_EXPORT
+
 
 
 
 ** Discussion of the results
+:PROPERTIES:
+:CUSTOM_ID: discussion-of-results
+:END:
 
 To see why having $n$ instances of src_scheme[:exports code]{double} causes
 there to be $2^{2^{n-1}}}$ calls to src_scheme[:exports code]{inc}, we again
-refer to [[#sec:function-trace]] as an illustration.  Firstly, in Steps 1-3 we see
+refer to [[#function-trace]] as an illustration.  Firstly, in Steps 1-3 we see
 that $2^{n-1}$ calls to src_scheme[:exports code]{double} are created.  Then in
 Steps 4-7 we see that each call to src_scheme[:exports code]{double} generates
 twice as many calls to the input function as in the previous step, resulting in
