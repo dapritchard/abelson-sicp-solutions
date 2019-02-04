@@ -1,6 +1,5 @@
 #+TITLE: SICP Exercise 1.41
 
-#+OPTIONS: author:nil
 #+OPTIONS: date:nil
 #+OPTIONS: toc:nil
 #+OPTIONS: num:nil
@@ -24,60 +23,96 @@
 #+END_EXPORT
 
 #+BEGIN_EXPORT latex
-  % background color for code environments
-  \definecolor{lightyellow}{RGB}{255,255,224}
-  \definecolor{lightbrown}{RGB}{249,234,197}
+% background color for code environments
+\definecolor{lightyellow}{RGB}{255,255,224}
+\definecolor{lightbrown}{RGB}{249,234,197}
+\definecolor{codeblockgray}{RGB}{230,230,230}
 
-  \lstset{%
-    basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont
-  }
+\lstset{%
+  basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont
+}
 
-  % create a listings environment for Bash
-  \lstdefinestyle{scheme}{%
-    language=lisp,
-    backgroundcolor=\color{lightyellow},
-    basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont,
-    keywordstyle=\color{Firebrick3},
-    stringstyle=\color{Green4},
-    commentstyle=\color{Purple3},
-    showstringspaces=false,
-    morecomment=[l]{userid@},
-    morecomment=[l]{onyenid@},
-    morecomment=[l]{localid@},
-    morecomment=[l]{sftp> },
-    moredelim=[is][\bfseries]{[*@}{@*]},
-    framesep=20pt,
-    framexleftmargin=5pt,
-    framextopmargin=20pt,
-    framexrightmargin=5pt,
-    framexbottommargin=20pt
-  }
+% create a listings environment for Bash
+\lstdefinestyle{scheme}{%
+  language=lisp,
+  % backgroundcolor=\color{lightyellow},
+  backgroundcolor=\color{gray!15},
+  basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont,
+  keywordstyle=\color{Firebrick3},
+  stringstyle=\color{Green4},
+  commentstyle=\color{Purple3},
+  showstringspaces=false,
+  morecomment=[l]{userid@},
+  morecomment=[l]{onyenid@},
+  morecomment=[l]{localid@},
+  morecomment=[l]{sftp> },
+  moredelim=[is][\bfseries]{[*@}{@*]},
+  frame=single,
+  frameround={tttt},
+  rulecolor=\color{gray!50}% ,
+  % framexleftmargin=2pt,
+  % framextopmargin=2pt,
+  % framexrightmargin=2pt,
+  % framexbottommargin=2pt
+}
 
-  % titlesec documentation:
-  % http://ctan.mackichan.com/macros/latex/contrib/titlesec/titlesec.pdf
+% titlesec documentation:
+% http://ctan.mackichan.com/macros/latex/contrib/titlesec/titlesec.pdf
 
-  % see pgs 4-5 of documentation for titlespacing syntax.  The command signature
-  % is: \titlespacing*{<command>}{<left>}{<before-sep>}{<after-sep>}[<right-sep>]
-  \titlespacing*{\section}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
-  \titlespacing*{\subsection}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
-  \titlespacing*{\subsubsection}{0pt}{5mm plus 1ex minus .2ex}{2mm plus .2ex}
+% see pgs 4-5 of documentation for titlespacing syntax.  The command signature
+% is: \titlespacing*{<command>}{<left>}{<before-sep>}{<after-sep>}[<right-sep>]
+\titlespacing*{\section}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
+\titlespacing*{\subsection}{0pt}{10mm plus 1ex minus .2ex}{2mm plus .2ex}
+\titlespacing*{\subsubsection}{0pt}{5mm plus 1ex minus .2ex}{2mm plus .2ex}
 
-  % see the following links for this definition:
-  %
-  %     https://tex.stackexchange.com/a/357339/88779
-  %     https://tex.stackexchange.com/q/408878
-  \makeatletter
-  \xpretocmd\lstinline
-  {%
-    \bgroup\fboxsep=1.5pt
-    \Colorbox{gray!20}\bgroup\kern-\fboxsep\vphantom{\ttfamily\char`\\y}%
-    \appto\lst@DeInit{\kern-\fboxsep\egroup\egroup}%
-  }{}{}
-  \makeatother
+% \pretitle{\begin{center}\LARGE}
+% \posttitle{\par\end{center}\vskip 0.5em}
+% \preauthor{\begin{center}
+% \large \lineskip 0.5em%
+% \begin{tabular}[t]{c}}
+% \postauthor{\end{tabular}\par\end{center}}
+% \predate{\begin{center}\large}
+% \postdate{\par\end{center}}
+
+\makeatletter
+\def\@maketitle{%
+  \newpage
+  \null
+  \vskip 2em%
+  \begin{center}%
+  \let \footnote \thanks
+    {\LARGE \@title \par}%
+    Hello, world
+    \vskip 1.5em%
+    {\large
+      \lineskip .5em%
+      \begin{tabular}[t]{c}%
+        \@author
+      \end{tabular}\par}%
+    \vskip 1em%
+    {\large \@date}%
+  \end{center}%
+  \par
+  \vskip 1.5em}
+\fi
+\makeatother
+
+% see the following links for this definition:
+%
+%     https://tex.stackexchange.com/a/357339/88779
+%     https://tex.stackexchange.com/q/408878
+\makeatletter
+\xpretocmd\lstinline
+{%
+  \bgroup\fboxsep=1.5pt
+  \Colorbox{gray!15}\bgroup\kern-\fboxsep\vphantom{\ttfamily\char`\\y}%
+  \appto\lst@DeInit{\kern-\fboxsep\egroup\egroup}%
+}{}{}
+\makeatother
 
 
-  % use the `scheme` listings definition
-  \lstset{style=scheme}
+% use the `scheme` listings definition
+\lstset{style=scheme}
 #+END_EXPORT
 
 
@@ -85,13 +120,13 @@
 
 * Exercise 1.41
 
-Define a procedure src_scheme[:exports code]{double} that takes a procedure of
+Define a procedure src_lisp[:exports code]{double} that takes a procedure of
 one argument as an argument and returns a procedure that applies the original
-procedure twice.  For example, if src_scheme[:exports code]{inc} is a procedure
-that adds 1 to its argument, then src_scheme[:exports code]{(double inc)} should
+procedure twice.  For example, if src_lisp[:exports code]{inc} is a procedure
+that adds 1 to its argument, then src_lisp[:exports code]{(double inc)} should
 be a procedure that adds 2.  What value is returned by the following expression?
 
-#+BEGIN_SRC scheme
+#+BEGIN_SRC lisp
   (((double (double double)) inc) 5)
 #+END_SRC
 
@@ -108,8 +143,8 @@ be a procedure that adds 2.  What value is returned by the following expression?
 :CUSTOM_ID: double-definition
 :END:
 
-We define the function src_scheme[:exports code]{double} as follows.
-#+BEGIN_SRC scheme
+We define the function src_lisp[:exports code]{double} as follows.
+#+BEGIN_SRC lisp
   ;; takes an input function `f` and returns a function that takes an input and
   ;; applies `f` to it twice
   (define (double f)
@@ -124,10 +159,10 @@ We define the function src_scheme[:exports code]{double} as follows.
 :CUSTOM_ID: example-usage
 :END:
 
-A few examples using src_scheme[:exports code]{double} are shown below.  We can see from the pattern that
-having $n$ instances of src_scheme[:exports code]{double} causes there to be $2^{2^{n-1}}}$ calls to
-src_scheme[:exports code]{inc}.
-#+BEGIN_SRC scheme
+A few examples using src_lisp[:exports code]{double} are shown below.  We can see from the pattern that
+having $n$ instances of src_lisp[:exports code]{double} causes there to be $2^{2^{n-1}}$ calls to
+src_lisp[:exports code]{inc}.
+#+BEGIN_SRC lisp
   ;; define `inc`
   (define (inc x) (1+ x))
 
@@ -152,8 +187,8 @@ src_scheme[:exports code]{inc}.
 :END:
 
 The following figure is provided to illustrate why the expression
-src_scheme[:exports code]{(((double (double double)) inc) 5)} results in 16
-calls to src_scheme[:exports code]{inc}.  There are a few conventions that are
+src_lisp[:exports code]{(((double (double double)) inc) 5)} results in 16
+calls to src_lisp[:exports code]{inc}.  There are a few conventions that are
 used in the figure in an attempt to make things more clear.  Rectangles are
 placed around some constructs to indicate that they are a function when taken as
 a whole.  Additionally, functions that are used either as arguments or as lambda
@@ -161,28 +196,28 @@ expression constructs are sometimes indicated by using a $\bullet$ (representing
 arguments) rather than as a valid Scheme expression so as to reduce visual
 clutter and sidestep syntactic details.
 # So for example, rather than writing
-# src_scheme[:exports code]{(lambda (x) (inc (inc x)))}, we might write
-# src_scheme[:exports code]{(inc (inc } $\bullet$ src_scheme[:exports code]{))}.
+# src_lisp[:exports code]{(lambda (x) (inc (inc x)))}, we might write
+# src_lisp[:exports code]{(inc (inc } $\bullet$ src_lisp[:exports code]{))}.
 
 We start with the original expression in Step 1, and in Step 2 we evaluate the
-expression src_scheme[:exports code]{(double double)} (using our $\bullet$
+expression src_lisp[:exports code]{(double double)} (using our $\bullet$
 notation), creating a new function that we denote by surrounding it with a
-rectangle.  Then in Step 3 we evaluate the outermost call to src_scheme[:exports
+rectangle.  Then in Step 3 we evaluate the outermost call to src_lisp[:exports
 code]{double}, creating a new function that is composed of the two functions
 denoted by the inner rectangular boxes.
 
-Next, in Step 4 we begin to thread the input argument src_scheme[:exports
+Next, in Step 4 we begin to thread the input argument src_lisp[:exports
 code]{inc} into our newly created function.  While the ordering depends on the
-implementation of the interpreter, at some point the src_scheme[:exports
+implementation of the interpreter, at some point the src_lisp[:exports
 code]{inc} argument will make its way all the way to the innermost call to
-src_scheme[:exports code]{double}, which is the step that is shown here as the
+src_lisp[:exports code]{double}, which is the step that is shown here as the
 innermost rectangle in the right-hand term.
 
 Next, in Step 5 the newly created function is passed to the next call to
-src_scheme[:exports code]{double}.  Then in Step 6 we can pass this entire
-function to the next call to src_scheme[:exports code]{double} creating yet
+src_lisp[:exports code]{double}.  Then in Step 6 we can pass this entire
+function to the next call to src_lisp[:exports code]{double} creating yet
 another function, which can then be passed to the outermost call to
-src_scheme[:exports code]{double} in Step 7.
+src_lisp[:exports code]{double} in Step 7.
 
 #+BEGIN_EXPORT latex
 \begin{figure}[htb]
@@ -212,10 +247,10 @@ src_scheme[:exports code]{double} in Step 7.
 :CUSTOM_ID: discussion-of-results
 :END:
 
-To see why having $n$ instances of src_scheme[:exports code]{double} causes
-there to be $2^{2^{n-1}}}$ calls to src_scheme[:exports code]{inc}, we again
+To see why having $n$ instances of src_lisp[:exports code]{double} causes
+there to be $2^{2^{n-1}}$ calls to src_lisp[:exports code]{inc}, we again
 refer to [[#function-trace]] as an illustration.  Firstly, in Steps 1-3 we see
-that $2^{n-1}$ calls to src_scheme[:exports code]{double} are created.  Then in
-Steps 4-7 we see that each call to src_scheme[:exports code]{double} generates
+that $2^{n-1}$ calls to src_lisp[:exports code]{double} are created.  Then in
+Steps 4-7 we see that each call to src_lisp[:exports code]{double} generates
 twice as many calls to the input function as in the previous step, resulting in
-the expression $2^{2^{n-1}}}$.
+the expression $2^{2^{n-1}}$.
