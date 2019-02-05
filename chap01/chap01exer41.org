@@ -1,5 +1,6 @@
 #+TITLE: SICP Exercise 1.41
 #+SETUPFILE: ../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer01.scm
 
 
 * Exercise 1.41
@@ -10,7 +11,7 @@ procedure twice.  For example, if src_lisp[:exports code]{inc} is a procedure
 that adds 1 to its argument, then src_lisp[:exports code]{(double inc)} should
 be a procedure that adds 2.  What value is returned by the following expression?
 
-#+BEGIN_SRC lisp
+#+BEGIN_SRC lisp :tangle no
   (((double (double double)) inc) 5)
 #+END_SRC
 
