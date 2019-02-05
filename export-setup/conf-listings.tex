@@ -1,0 +1,54 @@
+% ------------------------------------------------------------------------------
+% configure listings environments.  Requires the following packages:
+%
+% \usepackage{listings}
+% \usepackage[x11names]{xcolor}
+% ------------------------------------------------------------------------------
+
+% create a listings environment for Scheme
+\lstdefinestyle{scheme}{%
+  language=lisp,
+  backgroundcolor=\color{gray!15},
+  basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont,
+  keywordstyle=\color{Firebrick3},
+  stringstyle=\color{Green4},
+  commentstyle=\color{Purple3},
+  showstringspaces=false,
+  morecomment=[l]{userid@},
+  morecomment=[l]{onyenid@},
+  morecomment=[l]{localid@},
+  morecomment=[l]{sftp> },
+  moredelim=[is][\bfseries]{[*@}{@*]},
+  frame=single,
+  frameround={tttt},
+  rulecolor=\color{gray!50}
+}
+
+% add gray background box to lstinline output.  See the following links for this
+% definition:
+%
+% https://tex.stackexchange.com/a/357339/88779
+% https://tex.stackexchange.com/q/408878
+\makeatletter
+\xpretocmd\lstinline
+{%
+  \bgroup\fboxsep=1.5pt
+  \Colorbox{gray!15}\bgroup\kern-\fboxsep\vphantom{\ttfamily\char`\\y}%
+  \appto\lst@DeInit{\kern-\fboxsep\egroup\egroup}%
+}{}{}
+\makeatother
+
+% use the `scheme` listings definition globally for listings environments
+\lstset{style=scheme}
+
+% set the font globally (used in lstinline snippets)
+\lstset{%
+  basicstyle=\fontsize{9.75}{10.75}\fontfamily{pcr}\selectfont
+}
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% End:

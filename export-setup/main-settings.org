@@ -1,0 +1,30 @@
+# ------------------------------------------------------------------------------
+# shared Org mode settings
+# ------------------------------------------------------------------------------
+
+#+STARTUP: showeverything
+#+PROPERTY: :tangle yes
+
+#+OPTIONS: date:nil
+#+OPTIONS: toc:nil
+#+OPTIONS: num:nil
+#+OPTIONS: html-postamble:nil
+#+OPTIONS: html-style:nil
+
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../export-setup/github-pandoc.css" />
+
+#+LaTeX_HEADER: \usepackage[margin=1in]{geometry}
+#+LaTeX_HEADER: \usepackage[x11names]{xcolor}
+#+LaTeX_HEADER: \usepackage{titlesec}
+#+LaTeX_HEADER: \usepackage{xpatch}
+#+LaTeX_HEADER: \usepackage{realboxes}
+
+#+LaTeX_HEADER: \input{../export-setup/conf-hypersetup.tex}
+#+LaTeX_HEADER: \input{../export-setup/conf-sec-titles.tex}
+#+LaTeX_HEADER: \input{../export-setup/conf-listings.tex}
+#+LaTeX_HEADER: \input{../export-setup/redefine-maketitle.tex}
+
+#+BEGIN_EXPORT latex
+% remove excess whitespace after \maketitle command
+\vspace{-6mm}
+#+END_EXPORT

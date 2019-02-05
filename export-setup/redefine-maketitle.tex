@@ -1,0 +1,24 @@
+% see https://tex.stackexchange.com/a/216121/88779 for this redefinition of
+% maketitle
+\makeatletter
+\def\@maketitle{%
+  \newpage
+  \null
+  \vspace{-10mm}
+  % \vskip 2em%
+  \begin{center}%
+    \let \footnote \thanks
+    {\LARGE \@title \par}%
+    % \vskip 1.5em%
+    % {\large
+    % \lineskip .5em%
+    % \begin{tabular}[t]{c}%
+        %         \@author
+        %       \end{tabular}\par}%
+        %         \vskip 1em%
+        %         {\large \@date}%
+  \end{center}%
+  \par
+  % \vskip 3em
+}
+\makeatother
