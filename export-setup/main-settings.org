@@ -1,5 +1,12 @@
 # ------------------------------------------------------------------------------
 # shared Org mode settings
+#
+# note that we expect the following code to be in the init file or elsewhere
+# (see the docstring for `org-latex-listings` for details):
+#
+#     (setq org-latex-listings t)
+#     (require 'ox-latex)
+#     (add-to-list 'org-latex-packages-alist '("" "listings"))
 # ------------------------------------------------------------------------------
 
 #+STARTUP: showeverything
