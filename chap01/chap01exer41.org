@@ -2,8 +2,6 @@
 #+SETUPFILE: ../export-setup/main-settings.org
 
 
-
-
 * Exercise 1.41
 
 Define a procedure src_lisp[:exports code]{double} that takes a procedure of
@@ -138,8 +136,7 @@ src_lisp[:exports code]{double} in Step 7.
 
 To see why having $n$ instances of src_lisp[:exports code]{double} causes there
 to be $2^{2^{n-1}}$ calls to src_lisp[:exports code]{inc}, we again refer to
-@@latex:\autoref{fig:function-callgraph}@@
-@@html:the <a href="#function-callgraph">function call visual trace</a> @@
+@@latex:\autoref{fig:function-callgraph}@@ @@html:the <a href="#function-callgraph">function call visual trace</a> @@
 as an illustration.  Firstly, in Steps 1-3 we see that $2^{n-1}$
 calls to src_lisp[:exports code]{double} are created.  Then in Steps 4-7 we see
 that each call to src_lisp[:exports code]{double} generates twice as many calls
