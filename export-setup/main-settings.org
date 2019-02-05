@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 
 #+STARTUP: showeverything
-#+PROPERTY: :tangle yes
+#+PROPERTY: header-args :tangle yes
 
 #+OPTIONS: date:nil
 #+OPTIONS: toc:nil
