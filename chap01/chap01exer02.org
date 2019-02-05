@@ -1,0 +1,37 @@
+#+TITLE: SICP Exercise 1.2
+#+SETUPFILE: ../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer02.scm
+
+
+* Exercise 1.2
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Translate the following expression into prefix form.
+
+\begin{equation}
+\frac{
+  5 + 4 + (2 - (3 - (6 + 4/5)))
+}{
+  3(6 - 2)(2 - 7)
+}
+\end{equation}
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+The above expression can be expressed in prefix form as follows.
+#+BEGIN_SRC lisp
+  (/ (+ 5
+	4
+	(- 2 (- 3 (+ 6 (/ 4 5)))))
+     (* 3
+	(- 6 2)
+	(- 2 7)))
+#+END_SRC
