@@ -1,5 +1,5 @@
 #+TITLE: SICP Exercise 1.44
-#+SETUPFILE: ../export-setup/main-settings.org
+#+SETUPFILE: ../../export-setup/main-settings.org
 #+PROPERTY: header-args :tangle chap01exer44.scm
 
 
@@ -61,7 +61,7 @@ The following functions were created in Exercise 1.42 and Exercise 1.43.
 :CUSTOM_ID: smooth-definition
 :END:
 
-Create the src_lisp[:exports code]{smooth} function.
+Here we create the src_lisp[:exports code]{smooth} function.
 #+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   ;; takes a function `f` and positive value `dx`, and returns a function that
@@ -144,9 +144,10 @@ than 3 points to take the average over for the defintion of src_scheme[:exports
 code]{smooth}, and instead averaged over a total of 15 points.  Note, that the
 strongest introduction of noise in $f$ comes from the $0.3\cos(50x)$ term which
 has a periodicity of $2\pi / 50 \approx 0.13$, while the other terms had a
-periodicities of $2\pi/11 \approx 0.57$ and $2pi/7 \approx 0.89$.  With these
-values in mind, we set $dx$ to 0.05 which meant that it took the average over a
-window of width 0.7 since we had 15 total points.
+periodicities of $2\pi/11 \approx 0.57$ and $2\pi/7 \approx 0.89$.  With these
+values in mind, we set $dx$ to 0.05 which as a result causes the average to be
+taken over a window of width 0.7 (since we had 15 total points spaced 0.05 units
+apart from each other).
 
 In each of the four plots displayed below the black line represents the smoothed
 line, while the blue line shows the value of $\sin(x)$.  We see that 1-step

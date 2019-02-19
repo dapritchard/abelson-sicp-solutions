@@ -18,8 +18,8 @@
 #+OPTIONS: html-postamble:nil
 #+OPTIONS: html-style:nil
 
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../export-setup/github-pandoc.css" />
-#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../export-setup/conf-syntax-colors.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../export-setup/github-pandoc.css" />
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../../export-setup/conf-syntax-colors.css" />
 #+HTML_MATHJAX: align: left indent: 3em scale: 85
 
 #+LaTeX_HEADER: \usepackage[margin=1in]{geometry}
@@ -28,10 +28,10 @@
 #+LaTeX_HEADER: \usepackage{xpatch}
 #+LaTeX_HEADER: \usepackage{realboxes}
 
-#+LaTeX_HEADER: \input{../export-setup/conf-hypersetup.tex}
-#+LaTeX_HEADER: \input{../export-setup/conf-sec-titles.tex}
-#+LaTeX_HEADER: \input{../export-setup/conf-listings.tex}
-#+LaTeX_HEADER: \input{../export-setup/redefine-maketitle.tex}
+#+LaTeX_HEADER: \input{../../export-setup/conf-hypersetup.tex}
+#+LaTeX_HEADER: \input{../../export-setup/conf-sec-titles.tex}
+#+LaTeX_HEADER: \input{../../export-setup/conf-listings.tex}
+#+LaTeX_HEADER: \input{../../export-setup/redefine-maketitle.tex}
 
 #+BEGIN_EXPORT latex
 % remove excess whitespace after \maketitle command
