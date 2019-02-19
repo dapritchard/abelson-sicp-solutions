@@ -110,7 +110,7 @@ $\sin(x)$.[fn::Note that the following plots are created using the R language.]
   \caption{A plot of the example function.}
   \label{fig:example-function-plot}
   \vspace{3mm}
-  \includegraphics[width=1\textwidth]{figures/sin-f.pdf}
+  \includegraphics[width=1\textwidth]{figures/chap01exer44-sin-f.pdf}
 \end{figure}
 #+END_EXPORT
 
@@ -124,7 +124,7 @@ $\sin(x)$.[fn::Note that the following plots are created using the R language.]
 <a name="example-function-plot">
   <p class="aligncenter">
     <font size=4>A plot of the example function.</font><br>
-    <img src="figures/sin-f.svg" align="middle" />
+    <img src="figures/chap01exer44-sin-f.svg" align="middle" />
   </p>
 </a>
 #+END_EXPORT
@@ -164,7 +164,7 @@ away.
   \caption{Plot of multiple applications of smoothing.}
   \label{fig:smoothed-sin}
   \vspace{3mm}
-  \includegraphics[width=1\textwidth]{figures/smoothed-sin.pdf}
+  \includegraphics[width=1\textwidth]{figures/chap01exer44-smoothed-sin.pdf}
 \end{figure}
 #+END_EXPORT
 
@@ -172,7 +172,7 @@ away.
 <a name="smoothed-function-plot">
   <p class="aligncenter">
     <font size=4>Plot of multiple applications of smoothing.</font><br>
-    <img src="figures/smoothed-sin.svg" align="middle" />
+    <img src="figures/chap01exer44-smoothed-sin.svg" align="middle" />
   </p>
 </a>
 #+END_EXPORT
