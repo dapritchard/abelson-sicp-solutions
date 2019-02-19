@@ -19,6 +19,7 @@
 #+OPTIONS: html-style:nil
 
 #+HTML_HEAD: <link rel="stylesheet" type="text/css" href="../export-setup/github-pandoc.css" />
+#+HTML_MATHJAX: align: left indent: 3em
 
 #+LaTeX_HEADER: \usepackage[margin=1in]{geometry}
 #+LaTeX_HEADER: \usepackage[x11names]{xcolor}
