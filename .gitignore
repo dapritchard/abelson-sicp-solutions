@@ -1,8 +1,17 @@
+# PDF build artifacts from compiling LaTeX documents with AUCTeX (e.g. for
+# manual fixes outside of org mode)
+auto/
+*.aux
+*.log
+*.out
+*.synctex.gz
+
 # get rid of this once file structure changes are complete
 chap01/chap01exer??.pdf
 chap01/chap01exer??.html
 chap01/chap01exer??.tex
 
+# derived files from org mode exports
 chap0?/exer??/chap0?exer??.pdf
 chap0?/exer??/chap0?exer??.html
 chap0?/exer??/chap0?exer??.scm
