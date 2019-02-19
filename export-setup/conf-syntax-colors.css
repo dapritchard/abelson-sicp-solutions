@@ -20,12 +20,12 @@
 }
 
 .org-function-name {
-   color: #8cd0d3;
+    color: rgb(0, 0, 0);
    font-weight: bold;
 }
 
 .org-keyword {
-   color: rgb(143, 27, 27);
+   color: rgb(107, 20, 20);
    font-weight: bold;
 }
 
