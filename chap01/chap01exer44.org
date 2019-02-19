@@ -1,0 +1,178 @@
+#+TITLE: SICP Exercise 1.44
+#+SETUPFILE: ../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer44.scm
+
+
+* Exercise 1.44
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+
+The idea of "smoothing" a function is an important concept in signal processing.
+If $f$ is a function and $dx$ is some small number, then the smoothed version of
+$f$ is the function whose value at a point $x$ is the average of $f(x - dx)$,
+$f(x)$, and $f(x + dx)$.  Write a procedure src_scheme[:exports code]{smooth}
+that takes as input a procedure that computes $f$ and returns a procedure that
+computes the smoothed $f$.  It is sometimes valuable to repeatedly smooth a
+function (that is, smooth the smoothed function, and so on) to obtained the
+"\(n\)-fold smoothed function".  Show how to generate the \(n\)-fold smoothed
+function of any given function using src_scheme[:exports code]{smooth} and
+src_scheme[:exports code]{repeated} from Exercise 1.43.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+
+** Previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+The following functions were created in Exercise 1.42 and Exercise 1.43.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
+  ;; takes input functions `f` and `g` and returns a function that takes an input
+  ;; `x` and performs the composition `f(g(x))`
+  (define (compose f g)
+      (lambda (x)
+	(f (g x))))
+
+  ;; takes a function `f` and positive integer `n` as inputs and returns a
+  ;; function which starts by applying `f` on its input and then repeatedly
+  ;; applying `f` to the result of the previous application of `f` another `n - 1`
+  ;; times.
+  (define (repeated f n)
+      (if (= n 1)
+	  f
+	  (compose f (repeated f (- n 1)))))
+#+END_SRC
+
+
+
+
+** Definition of =smooth=
+:PROPERTIES:
+:CUSTOM_ID: smooth-definition
+:END:
+
+Create the src_lisp[:exports code]{smooth} function.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
+  ;; takes a function `f` and positive value `dx`, and returns a function that
+  ;; takes an input `x` and returns the average of `f(x - dx)`, `f(x)`, and `f(x +
+  ;; dx)`
+  (define (smooth f dx)
+    (lambda (x)
+      (/ (+ (f (- x dx))
+	    (f x)
+	    (f (+ x dx)))
+	 3)))
+
+  ;; takes a function `f`, positive integer `n`, and positive value `dx`, and
+  ;; returns a function that takes an input `x` and applies the smoothed version
+  ;; of `f(x)` using parameter `dx` to specify the width of the smoothing window
+  (define (n-smooth f n dx)
+    (lambda (x)
+      (repeated (smooth f dx) n)))
+#+END_SRC
+
+
+
+
+** Example usage
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+*** An example function
+:PROPERTIES:
+:CUSTOM_ID: example-function-definition
+:END:
+
+In this and the next sections we consider an example function that we will try
+to smooth.  The function is defined as
+\begin{equation}
+  f(x) = \sin(x) + 0.3\cos(50x) + 0.1\cos(11x) + 0.1\sin(7x).
+\end{equation}
+We can see that $\sin(x)$ is the main driver of the overall function, while the
+other terms and some fluctuation to $f$.  Here is a plot of this function from
+$-\pi$ to $\pi$ shown as the black line, with the blue line showing the value of
+$\sin(x)$.[fn::Note that the following plots are created using the R language.]
+
+#+BEGIN_EXPORT latex
+\begin{figure}[htb]
+  \caption{A plot of the example function.}
+  \label{fig:example-function-plot}
+  \vspace{3mm}
+  \includegraphics[width=1\textwidth]{figures/sin-f.pdf}
+\end{figure}
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<style>
+.aligncenter {
+    text-align: center;
+    color: rgb(0, 0, 0);
+}
+</style>
+<a name="example-function-plot">
+  <p class="aligncenter">
+    <font size=4>A plot of the example function.</font><br>
+    <img src="figures/sin-f.svg" align="middle" />
+  </p>
+</a>
+#+END_EXPORT
+
+
+
+
+
+*** Smoothing the example function
+:PROPERTIES:
+:CUSTOM_ID: example-function-smoothing
+:END:
+
+Now we will try to smooth $f$ using the techniques described in the exercise.
+From trial and error for this particular example we found it helpful to use more
+than 3 points to take the average over for the defintion of src_scheme[:exports
+code]{smooth}, and instead averaged over a total of 15 points.  Note, that the
+strongest introduction of noise in $f$ comes from the $0.3\cos(50x)$ term which
+has a periodicity of $2\pi / 50 \approx 0.13$, while the other terms had a
+periodicities of $2\pi/11 \approx 0.57$ and $2pi/7 \approx 0.89$.  With these
+values in mind, we set $dx$ to 0.05 which meant that it took the average over a
+window of width 0.7 since we had 15 total points.
+
+In each of the four plots displayed below the black line represents the smoothed
+line, while the blue line shows the value of $\sin(x)$.  We see that 1-step
+smoothing performs well recovering the original function, as we would expect
+since we constructed it that way.  For the repeated applications of smoothing we
+see that this has the effect of dampening the curves.  However it is interesting
+to note that the 35-ary application of src_scheme[:exports code]{smooth} results
+in multiple flat, distinct sections.  We note that one way that would be likely
+to get better results overall is to weight the entries when performing the
+averaging, so that closer points get more weight than points that are further
+away.
+
+#+BEGIN_EXPORT latex
+\begin{figure}[htb]
+  \caption{Plot of multiple applications of smoothing.}
+  \label{fig:smoothed-sin}
+  \vspace{3mm}
+  \includegraphics[width=1\textwidth]{figures/smoothed-sin.pdf}
+\end{figure}
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<a name="smoothed-function-plot">
+  <p class="aligncenter">
+    <font size=4>Plot of multiple applications of smoothing.</font><br>
+    <img src="figures/smoothed-sin.svg" align="middle" />
+  </p>
+</a>
+#+END_EXPORT
