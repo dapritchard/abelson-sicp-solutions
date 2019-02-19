@@ -17,7 +17,7 @@ $x \mapsto x + n$.  If $f$ is the operation of squaring a number, then the
 the \(2^n\)-th power.  Write a procedure that takes as inputs a procedure that
 computes $f$ and a positive integer $n$ and returns the procedure that computes
 the nth repeated application of $f$.  For example, the result of evaluating
-src_lisp[:exports code]{((repeated square 2) 5)} should be 625.
+src_scheme[:exports code]{((repeated square 2) 5)} should be 625.
 
 
 
@@ -33,7 +33,8 @@ src_lisp[:exports code]{((repeated square 2) 5)} should be 625.
 :END:
 
 The following function was created in Exercise 1.42.
-#+BEGIN_SRC lisp
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
   ;; takes input functions `f` and `g` and returns a function that takes an input
   ;; `x` and performs the composition `f(g(x))`
   (define (compose f g)
@@ -50,7 +51,8 @@ The following function was created in Exercise 1.42.
 :END:
 
 Create the src_lisp[:exports code]{repeated} function.
-#+BEGIN_SRC lisp
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
   ;; takes a function `f` and positive integer `n` as inputs and returns a
   ;; function which starts by applying `f` on its input and then repeatedly
   ;; applying `f` to the result of the previous application of `f` another `n - 1`
@@ -70,7 +72,7 @@ Create the src_lisp[:exports code]{repeated} function.
 :END:
 
 A few example uses of src_lisp[:exports code]{repeated}.
-#+BEGIN_SRC lisp
+#+BEGIN_SRC scheme
   ;; evaluates to a value of 5^4 = 625
   ((repeated square 2) 5)
 

@@ -12,7 +12,8 @@ Below is a sequence of expressions.  What is the result printed by the
 interpreter in response to each expression?  Assume that the sequence is to be
 evaluated in the order in which it is presented.
 
-#+BEGIN_SRC lisp :tangle no
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme :tangle no
   10
 
   (+ 5 3 4)
@@ -58,7 +59,8 @@ evaluated in the order in which it is presented.
 Comments have been added providing the value returned by the evaluated
 expressions.
 
-#+BEGIN_SRC lisp
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
   ;; 10
   10
 

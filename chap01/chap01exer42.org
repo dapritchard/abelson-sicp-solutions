@@ -10,9 +10,9 @@
 
 Let $f$ and $g$ be two one-argument functions.  The composition $f$ after $g$ is
 defined to be the function $x \mapsto f(g(x))$.  Define a procedure
-src_lisp[:exports code]{compose} that implements composition.  For example, if
-src_lisp[:exports code]{inc} is a procedure that adds 1 to its argument, then
-the result of evaluating src_lisp[:exports code]{((compose square inc) 6)}
+src_scheme[:exports code]{compose} that implements composition.  For example, if
+src_scheme[:exports code]{inc} is a procedure that adds 1 to its argument, then
+the result of evaluating src_scheme[:exports code]{((compose square inc) 6)}
 is 49.
 
 
@@ -28,8 +28,9 @@ is 49.
 :CUSTOM_ID: compose-definition
 :END:
 
-Create the src_lisp[:exports code]{compose} function.
-#+BEGIN_SRC lisp
+Create the src_scheme[:exports code]{compose} function.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
   ;; takes input functions `f` and `g` and returns a function that takes an input
   ;; `x` and performs the composition `f(g(x))`
   (define (compose f g)
@@ -45,8 +46,8 @@ Create the src_lisp[:exports code]{compose} function.
 :CUSTOM_ID: example-usage
 :END:
 
-A few example uses of src_lisp[:exports code]{compose}.
-#+BEGIN_SRC lisp
+A few example uses of src_scheme[:exports code]{compose}.
+#+BEGIN_SRC scheme
   ;; evaluates to a value of 49
   ((compose square 1+) 6)
 

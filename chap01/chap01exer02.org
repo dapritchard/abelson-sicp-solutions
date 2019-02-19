@@ -27,7 +27,7 @@ Translate the following expression into prefix form.
 :END:
 
 The above expression can be expressed in prefix form as follows.
-#+BEGIN_SRC lisp
+#+BEGIN_SRC scheme
   (/ (+ 5
 	4
 	(- 2 (- 3 (+ 6 (/ 4 5)))))
