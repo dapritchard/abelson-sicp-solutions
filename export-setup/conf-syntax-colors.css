@@ -1,0 +1,43 @@
+.org-comment {
+  color: rgb(129  27 192);
+}
+
+.org-comment-delimiter {
+   color: rgb(129  27 192);
+}
+
+.org-variable-name {
+   color: #8cd0d3;
+}
+
+.org-string {
+   color: rgb(0, 204, 0);
+}
+
+.org-type {
+   color: #8cd0d3;
+   font-weight: bold;
+}
+
+.org-function-name {
+   color: #8cd0d3;
+   font-weight: bold;
+}
+
+.org-keyword {
+   color: rgb(143, 27, 27);
+   font-weight: bold;
+}
+
+.org-doc {
+   color: #8cd0d3;
+}
+
+.org-constant {
+   color: #8cd0d3;
+   font-weight:bold;
+}
+
+.org-builtin {
+   color: rgb(143, 27, 27);
+}
