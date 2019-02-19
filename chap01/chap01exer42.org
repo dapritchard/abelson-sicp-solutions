@@ -1,0 +1,50 @@
+#+TITLE: SICP Exercise 1.42
+#+SETUPFILE: ../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer42.scm
+
+
+* Exercise 1.42
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Let $f$ and $g$ be two one-argument functions.  The composition $f$ after $g$ is
+defined to be the function $x \mapsto f(g(x))$.  Define a procedure
+src_lisp[:exports code]{compose} that implements composition.  For example, if
+src_lisp[:exports code]{inc} is a procedure that adds 1 to its argument, then
+the result of evaluating src_lisp[:exports code]{((compose square inc) 6)}
+is 49.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Definition of =compose=
+:PROPERTIES:
+:CUSTOM_ID: compose-definition
+:END:
+
+#+BEGIN_SRC lisp
+  ;; takes input functions `f` and `g` and returns a function that takes an input
+  ;; `x` and performs the composition `f(g(x))`
+  (define (compose f g)
+      (lambda (x)
+	(f (g x))))
+#+END_SRC
+
+
+
+
+** Example usage
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+#+BEGIN_SRC lisp
+  ;; evaluates to a value of 49
+  ((compose square 1+) 6)
+#+END_SRC
