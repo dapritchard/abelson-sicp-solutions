@@ -28,6 +28,7 @@ is 49.
 :CUSTOM_ID: compose-definition
 :END:
 
+Create the src_lisp[:exports code]{compose} function.
 #+BEGIN_SRC lisp
   ;; takes input functions `f` and `g` and returns a function that takes an input
   ;; `x` and performs the composition `f(g(x))`
@@ -44,7 +45,11 @@ is 49.
 :CUSTOM_ID: example-usage
 :END:
 
+A few example uses of src_lisp[:exports code]{compose}.
 #+BEGIN_SRC lisp
   ;; evaluates to a value of 49
   ((compose square 1+) 6)
+
+  ;; evaluates to a value of 37
+  ((compose 1+ square) 6)
 #+END_SRC

@@ -1,0 +1,82 @@
+#+TITLE: SICP Exercise 1.43
+#+SETUPFILE: ../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer43.scm
+
+
+* Exercise 1.43
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+If $f$ is a numerical function and $n$ is a positive integer, then we can form
+the \(n\)-th repeated application of $f$, which is defined to be the function
+whose value at $x$ is $f(f(...(f(x))...))$.  For example, if $f$ is the function
+$x \mapsto x + 1$, then the \(n\)-th repeated application of $f$ is the function
+$x \mapsto x + n$.  If $f$ is the operation of squaring a number, then the
+\(n\)-th repeated application of $f$ is the function that raises its argument to
+the \(2^n\)-th power.  Write a procedure that takes as inputs a procedure that
+computes $f$ and a positive integer $n$ and returns the procedure that computes
+the nth repeated application of $f$.  For example, the result of evaluating
+src_lisp[:exports code]{((repeated square 2) 5)} should be 625.
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+
+** Previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+The following function was created in Exercise 1.42.
+#+BEGIN_SRC lisp
+  ;; takes input functions `f` and `g` and returns a function that takes an input
+  ;; `x` and performs the composition `f(g(x))`
+  (define (compose f g)
+      (lambda (x)
+	(f (g x))))
+#+END_SRC
+
+
+
+
+** Definition of =repeated=
+:PROPERTIES:
+:CUSTOM_ID: repeated-definition
+:END:
+
+Create the src_lisp[:exports code]{repeated} function.
+#+BEGIN_SRC lisp
+  ;; takes a function `f` and positive integer `n` as inputs and returns a
+  ;; function which starts by applying `f` on its input and then repeatedly
+  ;; applying `f` to the result of the previous application of `f` another `n - 1`
+  ;; times.
+  (define (repeated f n)
+      (if (= n 1)
+	  f
+	  (compose f (repeated f (- n 1)))))
+#+END_SRC
+
+
+
+
+** Example usage
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+A few example uses of src_lisp[:exports code]{repeated}.
+#+BEGIN_SRC lisp
+  ;; evaluates to a value of 5^4 = 625
+  ((repeated square 2) 5)
+
+  ;; evaluates to a value of 2^8 = 256
+  ((repeated square 3) 2)
+
+  ;; evaluates to a value of 25
+  ((repeated 1+ 25) 0)
+#+END_SRC
