@@ -1,5 +1,5 @@
 #+TITLE: SICP Exercise 1.42
-#+SETUPFILE: ../export-setup/main-settings.org
+#+SETUPFILE: ../../export-setup/main-settings.org
 #+PROPERTY: header-args :tangle chap01exer42.scm
 
 
@@ -28,7 +28,7 @@ is 49.
 :CUSTOM_ID: compose-definition
 :END:
 
-Create the src_scheme[:exports code]{compose} function.
+Here we create the src_scheme[:exports code]{compose} function.
 #+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   ;; takes input functions `f` and `g` and returns a function that takes an input
@@ -46,7 +46,7 @@ Create the src_scheme[:exports code]{compose} function.
 :CUSTOM_ID: example-usage
 :END:
 
-A few example uses of src_scheme[:exports code]{compose}.
+Here we show a few example uses of src_scheme[:exports code]{compose}.
 #+BEGIN_SRC scheme
   ;; evaluates to a value of 49
   ((compose square 1+) 6)

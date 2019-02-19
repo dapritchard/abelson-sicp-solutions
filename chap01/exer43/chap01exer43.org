@@ -1,5 +1,5 @@
 #+TITLE: SICP Exercise 1.43
-#+SETUPFILE: ../export-setup/main-settings.org
+#+SETUPFILE: ../../export-setup/main-settings.org
 #+PROPERTY: header-args :tangle chap01exer43.scm
 
 
@@ -50,7 +50,7 @@ The following function was created in Exercise 1.42.
 :CUSTOM_ID: repeated-definition
 :END:
 
-Create the src_lisp[:exports code]{repeated} function.
+Here we create the src_lisp[:exports code]{repeated} function.
 #+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   ;; takes a function `f` and positive integer `n` as inputs and returns a
@@ -71,7 +71,7 @@ Create the src_lisp[:exports code]{repeated} function.
 :CUSTOM_ID: example-usage
 :END:
 
-A few example uses of src_lisp[:exports code]{repeated}.
+Here we show a few example uses of src_lisp[:exports code]{repeated}.
 #+BEGIN_SRC scheme
   ;; evaluates to a value of 5^4 = 625
   ((repeated square 2) 5)

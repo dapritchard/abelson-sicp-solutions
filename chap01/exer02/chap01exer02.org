@@ -1,5 +1,5 @@
 #+TITLE: SICP Exercise 1.2
-#+SETUPFILE: ../export-setup/main-settings.org
+#+SETUPFILE: ../../export-setup/main-settings.org
 #+PROPERTY: header-args :tangle chap01exer02.scm
 
 
