@@ -1,0 +1,289 @@
+#+TITLE: SICP Exercise 1.45
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer45.scm
+
+
+* Exercise 1.45
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+We saw in Section 1.3.3 that attempting to compute square roots by naively
+finding a fixed point of $y \mapsto x/y$ does not converge, and that this can be
+fixed by average damping.  The same method works for finding cube roots as fixed
+points of the average-damped $y \mapsto x/y^2$.  Unfortunately, the process does
+not work for fourth roots -- a single average damp is not enough to make a
+fixed-point search for $y \mapsto x/y^3$ converge.  On the other hand, if we
+average damp twice, (i.e., use the average damp of the average damp of $y
+\mapsto x/y^3$) the fixed-point search does converge.  Do some experiments to
+determine how many average damps are required to compute \(n\)-th roots as a
+fixed-point search based upon repeated average damping of $y \mapsto
+x/y^{(n-1)}$.  Use this to implement a simple procedure for computing \(n\)-th
+roots using src_scheme[:exports code]{fixed-point}, src_scheme[:exports
+code]{average-damp}, and the src_scheme[:exports code]{repeated} procedure of
+Exercise 1.43.  Assume that any arithmetic operations you need are available as
+primitives.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Define previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+*** Previously used functions =fixed-point= and =average-damp=
+:PROPERTIES:
+:CUSTOM_ID: define-fixed-and-average
+:END:
+
+The following function were provided in Section 1.33 and Section 1.3.4.  Recall
+the description of src_scheme[:exports code]{fixed-point} from Section 1.33.
+#+BEGIN_QUOTE
+The "half-interval method" is a simple but powerful technique for finding roots
+of an equation $f(x) = 0$, where $f$ is a continuous function.  The idea is
+that, if we are given points $a$ and $b$ such that $f(a) < 0 < f(b)$, then $f$ must
+have at least one zero between $a$ and $b$.  To locate a zero, let $x$ be the average
+of $a$ and $b$ and compute $f(x)$.  If $f(x) > 0$, then $f$ must have a zero between $a$ and
+$x$.  If $f(x) < 0$, then $f$ must have a zero between $x$ and $b$.  Continuing in this
+way, we can identify smaller and smaller intervals on which $f$ must have a zero.
+#+END_QUOTE
+And also recall the following description of average damping in the context of
+$y \mapsto x/y$ from Section 1.33.
+#+BEGIN_QUOTE
+Unfortunately, this fixed-point search does not converge.  Consider an initial
+guess $y_1$.  The next guess is $y_2 = x/y_1$ and the next guess is $y_3 = x/y_2
+= x/(x/y_1) = y_1$.  This results in an infinite loop in which the two guesses
+$y_1$ and $y_2$ repeat over and over, oscillating about the answer.
+
+One way to control such oscillations is to prevent the guesses from changing so
+much.  Since the answer is always between our guess $y$ and $x/y$, we can make a new
+guess that is not as far from $y$ as $x/y$ by averaging $y$ with $x/y$, so that the next
+guess after $y$ is $(1/2)(y + x/y)$ instead of $x/y$.
+#+END_QUOTE
+
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
+  ;; a measure of closeness to be used as a parameter for defining when
+  ;; convergence has occurred
+  (define tolerance 0.00001)
+
+  ;; search for a fixed point for the function `f`, starting with the value of
+  ;; `first-guess`.  Note that this function should probably have a stopping
+  ;; criterion for function / value pairs for which convergence does not occur.
+  (define (fixed-point f first-guess)
+    (define (close-enough? v1 v2)
+      (< (abs (- v1 v2)) tolerance))
+    (define (try guess)
+      (let ((next (f guess)))
+	(if (close-enough? guess next)
+	    next
+	    (try next))))
+    (try first-guess))
+
+  ;; return a function that takes an argument `x` and returns the average of `x`
+  ;; and `f(x)`
+  (define (average-damp f)
+    (lambda (x) (average x (f x))))
+
+  ;; `average` was defined in Section 1.1.7.
+  (define (average x y)
+    (/ (+ x y) 2))
+#+END_SRC
+
+
+
+
+*** Define previously used functions =compose= and =repeated=
+:PROPERTIES:
+:CUSTOM_ID: define-repeated
+:END:
+
+Recall the definition of src_scheme[:exports code]{compose} and
+src_scheme[:exports code]{repeated} from Exercise 1.42 and Exercise 1.43,
+respectively.
+#+BEGIN_SRC scheme
+  ;; takes input functions `f` and `g` and returns a function that takes an input
+  ;; `x` and performs the composition `f(g(x))`
+  (define (compose f g)
+      (lambda (x)
+	(f (g x))))
+
+  ;; takes a function `f` and positive integer `n` as inputs and returns a
+  ;; function which starts by applying `f` on its input and then repeatedly
+  ;; applying `f` to the result of the previous application of `f` another `n - 1`
+  ;; times.
+  (define (repeated f n)
+      (if (= n 1)
+	  f
+	  (compose f (repeated f (- n 1)))))
+#+END_SRC
+
+
+
+
+** Newly created functions
+:PROPERTIES:
+:CUSTOM_ID: new-functions
+:END:
+
+*** Define =safe-fixed-points=
+:PROPERTIES:
+:CUSTOM_ID: define-safe-fixed-points
+:END:
+
+src_scheme[:exports code]{safe-fixed-point} is a variant on src_scheme[:exports
+code]{fixed-point} that will exit if the function has performed
+src_scheme[:exports code]{max-iter} iterations without converging..
+#+BEGIN_SRC scheme
+  ;; a measure of closeness to be used as a parameter for defining when
+  ;; convergence has occurred
+  (define max-iter 1000)
+
+  ;; search for a fixed point for the function `f`, starting with the value of
+  ;; `first-guess`.  Note that this function should probably have a stopping
+  ;; criterion for function / value pairs for which convergence does not occur.
+  (define (safe-fixed-point f first-guess)
+    (define (close-enough? v1 v2)
+      (< (abs (- v1 v2)) tolerance))
+    (define (try guess n)
+      (let ((next (f guess)))
+	(cond ((close-enough? guess next) next)
+	      ((> n 0) (try next (- n 1)))
+	      (else 'convergence-not-achieved))))
+    (try first-guess max-iter))
+#+END_SRC
+
+
+
+
+*** Define =n-average-damp=
+:PROPERTIES:
+:CUSTOM_ID: define-n-average-damp
+:END:
+
+Create a function that performs multiple dampenings on an input function.
+#+BEGIN_SRC scheme
+  ;; takes input function `f` and positive integer `n`, and performs average
+  ;; dampending on `f` a total of `n` times
+  (define (n-average-damp f n)
+    ((repeated average-damp n) f))
+#+END_SRC
+
+
+
+
+
+
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: new-functions
+:END:
+
+*** Define =calc-fixed-point-nth-root-of-2=
+:PROPERTIES:
+:CUSTOM_ID: define-calc-fixed-point-nth-root-of-2
+:END:
+
+In this section we create the function src_scheme[:exports
+code]{calc-fixed-point-nth-root-of-2} to use for our examples.  This function
+allows us to calculate the \(n\)-th root of 2 using various degrees of
+dampening.  Note that the value of 2 was arbitrarily chosen.
+#+BEGIN_SRC scheme
+  ;; takes a positive value `x` and a positive value `n` as an inputs and returns
+  ;; a function that takes a value `y` as an input perfoms the fixed-point
+  ;; calculation for `x^{1/n}` given a guess `y`.  Recall that the fixed-point
+  ;; function for `x^{1/n}` is the function `f(y) = (x / (y^{n-1}))`.
+  (define (make-fixed-point-nth-root x n)
+    (lambda (y)
+      (/ x (expt y (- n 1)))))
+
+  ;; takes a positive value `n` as input and returns a function that takes an
+  ;; input `y` and returns the fixed-point calulation for `2^{1/n}` given a guess
+  ;; of `y`
+  (define (make-fixed-point-nth-root-of-2 n)
+    (make-fixed-point-nth-root 2 n))
+
+  ;; calculates the n-th root of 2 using the fixed point method with `degree-damp`
+  ;; degrees of dampening, and using a starting-point value of 1.
+  (define (calc-fixed-point-nth-root-of-2 n degree-damp)
+    (safe-fixed-point (n-average-damp (make-fixed-point-nth-root-of-2 n)
+				      degree-damp)
+		      1.0))
+#+END_SRC
+
+
+
+
+*** Observe the level of dampening needed for convergence
+:PROPERTIES:
+:CUSTOM_ID: observe-dampening-needed
+:END:
+
+In these examples we can see that convergence is not achieved whenever
+$\log_2(n)$ is greater than the degree of dampening.
+#+BEGIN_SRC scheme
+  (calc-fixed-point-nth-root-of-2  2 1)
+  (calc-fixed-point-nth-root-of-2  3 1)
+  (calc-fixed-point-nth-root-of-2  4 1) ;; convergence not achieved
+  (calc-fixed-point-nth-root-of-2  4 2)
+  (calc-fixed-point-nth-root-of-2  5 2)
+  (calc-fixed-point-nth-root-of-2  6 2)
+  (calc-fixed-point-nth-root-of-2  7 2)
+  (calc-fixed-point-nth-root-of-2  8 2) ;; convergence not achieved
+  (calc-fixed-point-nth-root-of-2  8 3)
+  (calc-fixed-point-nth-root-of-2  9 3)
+  (calc-fixed-point-nth-root-of-2 10 3)
+  (calc-fixed-point-nth-root-of-2 11 3)
+  (calc-fixed-point-nth-root-of-2 12 3)
+  (calc-fixed-point-nth-root-of-2 13 3)
+  (calc-fixed-point-nth-root-of-2 15 3)
+  (calc-fixed-point-nth-root-of-2 16 3) ;; convergence not achieved
+  (calc-fixed-point-nth-root-of-2 16 4)
+  (calc-fixed-point-nth-root-of-2 31 4)
+  (calc-fixed-point-nth-root-of-2 32 4) ;; convergence not achieved
+  (calc-fixed-point-nth-root-of-2 32 5)
+#+END_SRC
+
+
+
+
+*** Define =nth-root=
+:PROPERTIES:
+:CUSTOM_ID: define-nth-root
+:END:
+
+Define src_scheme[:exports code]{nth-root} for calcuting roots using the
+fixed-point method.
+#+BEGIN_SRC scheme
+  ;; calculates `log_2(x)`
+  (define (log2 x)
+    (/ (log x) (log 2)))
+
+  ;; takes an input `n` and calculate the number of degrees of dampending that we
+  ;; need, which we have hypothesized is `floor(log2(n))`
+  (define (nth-root-degree-damp n)
+    (floor (log2 n)))
+
+  ;; takes a positive value `x` and a positive value `n`, and calculates `x^{1/n}`
+  (define (nth-root x n)
+    (safe-fixed-point (n-average-damp (make-fixed-point-nth-root x n)
+				      (nth-root-degree-damp n))
+		      1.0))
+
+  ;; try some examples.  Results should be approximately equal to the values on
+  ;; the right.
+  (nth-root 2.0 2)   ;; 1.4142135624
+  (nth-root 2.0 4)   ;; 1.1892071150
+  (nth-root 2.0 8)   ;; 1.0905077327
+  (nth-root 2.0 16)  ;; 1.0442737824
+  (nth-root 2.0 32)  ;; 1.0218971487
+  (nth-root 2.0 64)  ;; 1.0108892861
+#+END_SRC
