@@ -67,7 +67,7 @@ guess that is not as far from $y$ as $x/y$ by averaging $y$ with $x/y$, so that 
 guess after $y$ is $(1/2)(y + x/y)$ instead of $x/y$.
 #+END_QUOTE
 
-#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+ATTR_LATEX: :options morekeywords={define,lambda},deletekeywords=abs
 #+BEGIN_SRC scheme
   ;; a measure of closeness to be used as a parameter for defining when
   ;; convergence has occurred
@@ -107,6 +107,7 @@ guess after $y$ is $(1/2)(y + x/y)$ instead of $x/y$.
 Recall the definition of src_scheme[:exports code]{compose} and
 src_scheme[:exports code]{repeated} from Exercise 1.42 and Exercise 1.43,
 respectively.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   ;; takes input functions `f` and `g` and returns a function that takes an input
   ;; `x` and performs the composition `f(g(x))`
@@ -140,6 +141,7 @@ respectively.
 src_scheme[:exports code]{safe-fixed-point} is a variant on src_scheme[:exports
 code]{fixed-point} that will exit if the function has performed
 src_scheme[:exports code]{max-iter} iterations without converging..
+#+ATTR_LATEX: :options morekeywords={define,lambda},deletekeywords=abs
 #+BEGIN_SRC scheme
   ;; a measure of closeness to be used as a parameter for defining when
   ;; convergence has occurred
@@ -168,6 +170,7 @@ src_scheme[:exports code]{max-iter} iterations without converging..
 :END:
 
 Create a function that performs multiple dampenings on an input function.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   ;; takes input function `f` and positive integer `n`, and performs average
   ;; dampending on `f` a total of `n` times
@@ -196,6 +199,7 @@ In this section we create the function src_scheme[:exports
 code]{calc-fixed-point-nth-root-of-2} to use for our examples.  This function
 allows us to calculate the \(n\)-th root of 2 using various degrees of
 dampening.  Note that the value of 2 was arbitrarily chosen.
+#+ATTR_LATEX: :options morekeywords={define,lambda},deletekeywords=expt
 #+BEGIN_SRC scheme
   ;; takes a positive value `x` and a positive value `n` as an inputs and returns
   ;; a function that takes a value `y` as an input perfoms the fixed-point
@@ -229,6 +233,7 @@ dampening.  Note that the value of 2 was arbitrarily chosen.
 
 In these examples we can see that convergence is not achieved whenever
 $\log_2(n)$ is greater than the degree of dampening.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   (calc-fixed-point-nth-root-of-2  2 1)
   (calc-fixed-point-nth-root-of-2  3 1)
@@ -262,6 +267,7 @@ $\log_2(n)$ is greater than the degree of dampening.
 
 Define src_scheme[:exports code]{nth-root} for calcuting roots using the
 fixed-point method.
+#+ATTR_LATEX: :options morekeywords={define,lambda},deletekeywords=log,floor
 #+BEGIN_SRC scheme
   ;; calculates `log_2(x)`
   (define (log2 x)
