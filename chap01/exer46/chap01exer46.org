@@ -1,0 +1,207 @@
+#+TITLE: SICP Exercise 1.46
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer46.scm
+
+
+* Exercise 1.46
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Several of the numerical methods described in this chapter are instances of an
+extremely general computational strategy known as "iterative improvement."
+Iterative improvement says that, to compute something, we start with an initial
+guess for the answer, test if the guess is good enough, and otherwise improve
+the guess and continue the process using the improved guess as the new guess.
+Write a procedure src_scheme[:exports code]{iterative-improve} that takes two
+procedures as arguments: a method for telling whether a guess is good enough and
+a method for improving a guess.  src_scheme[:exports code]{iterative-improve}
+should return as its value a procedure that takes a guess as argument and keeps
+improving the guess until it is good enough.  Rewrite the src_scheme[:exports
+code :options]{sqrt} procedure of Section 1.1.7 and the src_scheme[:exports
+code]{fixed-point} procedure of Section 1.33 in terms of src_scheme[:exports
+code]{iterative-improve}.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Define previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+*** Define =sqrt=
+:PROPERTIES:
+:CUSTOM_ID: define-sqrt
+:END:
+
+Recall the definition of the following functions in Section 1.1.7.
+#+ATTR_LATEX: :options morekeywords={define,lambda},deletekeywords={sqrt,abs}
+#+BEGIN_SRC scheme
+  ;; calculate the square root of `x`
+  (define (sqrt x)
+    (sqrt-iter 1.0 x))
+
+  ;; calculate the square root of `x` starting with an initial guess `guess`
+  (define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+	guess
+	(sqrt-iter (improve guess x)
+		   x)))
+
+  ;; the updating function for calculating the square root of `x` based on current
+  ;; guess `guess`.  This function used to calculate the (k + 1)-th value in the
+  ;; iterative sequence based on the k-th value in the sequence (where the k-th
+  ;; value given by `guess`).
+  (define (improve guess x)
+    (average guess (/ x guess)))
+
+  ;; calculate the average of two values `x` and `y`
+  (define (average x y)
+    (/ (+ x y) 2))
+
+  ;; a predicate function that determines if convergence has been achieved based
+  ;; on the values given by `guess` and `x`
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+#+END_SRC
+
+
+
+
+*** Define =fixed-point=
+:PROPERTIES:
+:CUSTOM_ID: define-fixed-point
+:END:
+
+Recall the definition of src_scheme[:exports code]{fixed-point} from Section 1.3.3.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
+  ;; a measure of closeness to be used as a parameter for defining when
+  ;; convergence has occurred
+  (define tolerance 0.00001)
+
+  ;; search for a fixed point for the function `f`, starting with the value of
+  ;; `first-guess`
+  (define (fixed-point f first-guess)
+    (define (close-enough? v1 v2)
+      (< (abs (- v1 v2)) tolerance))
+    (define (try guess)
+      (let ((next (f guess)))
+	(if (close-enough? guess next)
+	    next
+	    (try next))))
+    (try first-guess))
+#+END_SRC
+
+
+
+
+** Define new functions
+:PROPERTIES:
+:CUSTOM_ID: iterative-improve
+:END:
+
+*** Define =iterative-improve=
+:PROPERTIES:
+:CUSTOM_ID: iterative-improve
+:END:
+
+The definition of src_scheme[:exports code]{iterative-improve} is provided
+below.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
+  ;; used to define the maximum number of iterations to attempt
+  (define max-iter 1000)
+
+  ;; takes two functions `f` and `close-enough` as inputs, and returns a function
+  ;; that takes a single input and performs an iterative improvement algorithm
+  ;; upon invokation.  The input function `f` takes a single argument such that
+  ;; applying `f` to the k-th value in the iterative sequence yields the (k +
+  ;; 1)-th value in the sequence.  The input function `close-enough?` is a
+  ;; predicate that takes the k-th and (k + 1)-th values in the iterative sequence
+  ;; and determines whether convergence has been achieved.
+  (define (iterative-improve f close-enough?)
+    (define (try guess n)
+      (let ((next (f guess)))
+	(cond ((close-enough? guess next) next)
+	      ((> n 0) (try next (- n 1)))
+	      (else 'convergence-not-achieved))))
+    (lambda (first-guess)
+      (try first-guess max-iter)))
+#+END_SRC
+
+
+
+
+*** Define =sqrt-alt=
+:PROPERTIES:
+:CUSTOM_ID: iterative-improve
+:END:
+
+The alternative definition for the square root function is shown below.  Of
+interest, note that the anonymous function passed as the second argument to
+src_scheme[:exports code]{iterative-improve} takes two arguments to conform to
+the function's API, but it actually only uses the value src_scheme[:exports
+code]{guess}, and takes the value of src_scheme[:exports code]{x} from its
+enclosing environment.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
+#+BEGIN_SRC scheme
+  ;; calculate the square root of `x`
+  (define (sqrt-alt x)
+    (let ((sqrt-alt-iter (iterative-improve (lambda (guess)
+					      (improve guess x))
+					    (lambda (guess next)
+					      (good-enough? guess x)))))
+      (sqrt-alt-iter 1.0)))
+#+END_SRC
+
+
+
+
+*** Define =fixed-point-alt=
+:PROPERTIES:
+:CUSTOM_ID: fixed-point-alt
+:END:
+
+The alternative definition for the fixed point function is shown below.
+#+ATTR_LATEX: :options morekeywords={define,lambda},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; search for a fixed point for the function `f`, starting with the value of
+  ;; `first-guess`
+  (define (fixed-point-alt f first-guess)
+    (define (close-enough? v1 v2)
+      (< (abs (- v1 v2)) tolerance))
+    (let ((fixed-point-iter (iterative-improve f close-enough?)))
+      (fixed-point-iter first-guess)))
+#+END_SRC
+
+
+
+
+*** Test cases
+:PROPERTIES:
+:CUSTOM_ID: test-cases
+:END:
+
+A few test cases are shown below.
+#+ATTR_LATEX: :options morekeywords=lambda,deletekeywords={sin,cos}
+#+BEGIN_SRC scheme
+  ;; a few examples calculating the square root
+  (sqrt-alt 2.0)   ;; 1.4142135624
+  (sqrt-alt 4.0)   ;; 2
+  (sqrt-alt 9.0)   ;; 3
+  (sqrt-alt 16.0)  ;; 4
+  (sqrt-alt 25.0)  ;; 5
+
+  ;; y = cos(y) implies y = 0.7390822985224023
+  (fixed-point-alt cos 1.0)
+  ;; y = sin(y) + cos(y) impiles y = 1.2587315962971173
+  (fixed-point-alt (lambda (y) (+ (sin y) (cos y)))
+		   1.0)
+#+END_SRC
