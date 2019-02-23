@@ -1,0 +1,67 @@
+#+TITLE: SICP Exercise 1.03
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer03.scm
+
+
+* Exercise 1.03
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Define a procedure that takes three numbers as arguments and returns the sum of
+the squares of the two larger numbers.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Definition of a sum of squares for the largest two-out-of-three values
+:PROPERTIES:
+:CUSTOM_ID: sum-sq-max-two
+:END:
+
+Here is one implementation.
+#+BEGIN_SRC scheme
+  ;; takes three values `x`, `y`, and `z` as inputs and returns `w_{(2)}^2 +
+  ;; w_{(3)}^2`, where `w_{(1)}, w_{(2)}`, and `w_{(3)}` are the order statistics
+  ;; corresponding to the inputs
+  (define  (sum-sq-max-two x y z)
+    (cond ((and (<= x y) (<= x z))
+	   (+ (* y y) (* z z)))
+	  ((and (<= y x) (<= y z))
+	   (+ (* x x) (* z z)))
+	  (else
+	   (+ (* x x) (* y y)))))
+#+END_SRC
+
+
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: test-cases
+:END:
+
+Exhaustively test all of the possible cases in terms of the number of ties in
+the three values.
+#+BEGIN_SRC scheme
+  ;; no equal values
+  (sum-sq-max-two 3 4 5) ;; 41
+  (sum-sq-max-two 3 5 4) ;; 41
+  (sum-sq-max-two 4 3 5) ;; 41
+  (sum-sq-max-two 4 5 3) ;; 41
+  (sum-sq-max-two 5 3 4) ;; 41
+  (sum-sq-max-two 5 4 3) ;; 41
+
+  ;; one pair of equal value
+  (sum-sq-max-two 3 3 5) ;; 34
+  (sum-sq-max-two 3 5 3) ;; 34
+  (sum-sq-max-two 5 3 3) ;; 34
+
+  ;; all equal values
+  (sum-sq-max-two 3 3 3) ;; 18
+#+END_SRC
