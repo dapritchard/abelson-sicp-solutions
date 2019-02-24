@@ -1,0 +1,77 @@
+#+TITLE: SICP Exercise 1.05
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer05.scm
+
+
+* Exercise 1.05
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Ben Bitdiddle has invented a test to determine
+whether the interpreter he is faced with is using
+applicative-order evaluation or normal-order evaluation.  He
+defines the following two procedures:
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (define (p) (p))
+
+  (define (test x y)
+    (if (= x 0)
+	0
+	y))
+#+END_SRC
+Then he evaluates the expression
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+     (test 0 (p))
+#+END_SRC
+What behavior will Ben observe with an interpreter that uses applicative-order
+evaluation?  What behavior will he observe with an interpreter that uses
+normal-order evaluation?  Explain your answer.  (Assume that the evaluation rule
+for the special form src_scheme[:exports code]{if} is the same whether the
+interpreter is using normal or applicative order:  the predicate expression is
+evaluated first, and the result determines whether to evaluate the consequent or
+the alternative expression.)
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Normal-order evaluation
+:PROPERTIES:
+:CUSTOM_ID: normal-order-evaluation
+:END:
+
+The src_scheme[:exports code]{(p)} gets evaluated before the conditional which
+causes a never-ending recursive evaluation to be triggered.
+
+
+
+
+** Applicative-order evaluation
+:PROPERTIES:
+:CUSTOM_ID: applicative-order-evaluation
+:END:
+
+The following is the evaluation trace using applicative-order evaluation.
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (test 0 (p))
+
+  (if (= 0 0)
+      0
+      (p))
+
+  (if #t
+      0
+      (p))
+
+  0
+#+END_SRC
