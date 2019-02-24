@@ -25,6 +25,7 @@ the squares of the two larger numbers.
 :END:
 
 Here is one implementation.
+#+ATTR_LATEX: :options morekeywords={define,lambda}
 #+BEGIN_SRC scheme
   ;; takes three values `x`, `y`, and `z` as inputs and returns `w_{(2)}^2 +
   ;; w_{(3)}^2`, where `w_{(1)}, w_{(2)}`, and `w_{(3)}` are the order statistics
