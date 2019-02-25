@@ -1,0 +1,106 @@
+#+TITLE: SICP Exercise 1.06
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer06.scm
+
+
+* Exercise 1.06
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Alyssa P. Hacker doesn't see why src_scheme[:exports code]{if} needs to be
+provided as a special form.  "Why can't I just define it as an ordinary
+procedure in terms of src_scheme[:exports code]{cond}?" she asks.  Alyssa's
+friend Eva Lu Ator claims this can indeed be done, and she defines a new version
+of src_scheme[:exports code]{if}:
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (define (new-if predicate then-clause else-clause)
+    (cond (predicate then-clause)
+	  (else else-clause)))
+#+END_SRC
+Eva demonstrates the program for Alyssa:
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (new-if (= 2 3) 0 5)  ;; evaluates to 5
+
+  (new-if (= 1 1) 0 5)  ;; evaluates to 0
+#+END_SRC
+Delighted, Alyssa uses src_scheme[:exports code]{new-if} to rewrite the
+square-root program:
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (define (new-sqrt-iter guess x)
+    (new-if (good-enough? guess x)
+	    guess
+	    (new-sqrt-iter (improve guess x)
+			   x)))
+#+END_SRC
+What happens when Alyssa attempts to use this to compute square roots?  Explain.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+Recall the definition of src_scheme[:exports code]{sqrt-iter} and other helper
+functions from Section 1.1.7.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; calculate the square root of `x` starting with an initial guess `guess`
+  (define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+	  guess
+	  (sqrt-iter (improve guess x)
+		     x)))
+
+  ;; the updating function for calculating the square root of `x` based on current
+  ;; guess `guess`.  This function is used to calculate the (k + 1)-th value in
+  ;; the iterative sequence based on the k-th value in the sequence (and where the
+  ;; k-th value given by `guess`).
+  (define (improve guess x)
+    (average guess (/ x guess)))
+
+  ;; calculate the average of two values `x` and `y`
+  (define (average x y)
+    (/ (+ x y) 2))
+
+  ;; a predicate function that determines if convergence has been achieved based
+  ;; on the values given by `guess` and `x`
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+#+END_SRC
+
+
+
+
+** Discussion
+:PROPERTIES:
+:CUSTOM_ID: discussion
+:END:
+
+When src_scheme[:exports code]{sqrt-iter} is called, the interpreter evaluates
+all of the arguments to src_scheme[:exports code]{new-if} since it performs
+applicative order evaluation.  So even though src_scheme[:exports code]{cond} is
+a special form, the arguments are evaluated /before/ they even make it to the
+special form.  As a result, every call to src_scheme[:exports
+code]{new-sqrt-iter} results in a recursive call to src_scheme[:exports
+code]{new-sqrt-iter}, and thus the recursion never ends.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (sqrt-iter 1.0 2.0)  ;; 1.41421356
+  (new-sqrt-iter 1.0 2.0)  ;; infinite recursion
+#+END_SRC
