@@ -1,0 +1,50 @@
+#+TITLE: SICP Exercise 1.&&
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer&&.scm
+
+
+* Exercise 1.&&
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Provide exercise prompt here.  Here is an inline code section:
+src_scheme[:exports code]{some code}.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+BEGIN_SRC scheme
+  (myfun some data)
+#+END_SRC
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+The following function was created in blah blah blahs.
+
+
+
+
+** Definition of new functions
+:PROPERTIES:
+:CUSTOM_ID: new-functions
+:END:
+
+
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+Test cases
