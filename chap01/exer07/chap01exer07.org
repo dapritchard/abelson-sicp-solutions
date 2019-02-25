@@ -1,0 +1,230 @@
+#+TITLE: SICP Exercise 1.07
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer07.scm
+
+
+* Exercise 1.07
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+The src_scheme[:exports code]{good-enough?} test used in computing square roots
+will not be very effective for finding the square roots of very small numbers.
+Also, in real computers, arithmetic operations are almost always performed with
+limited precision.  This makes our test inadequate for very large numbers.
+Explain these statements, with examples showing how the test fails for small and
+large numbers.  An alternative strategy for implementing src_scheme[:exports
+code]{good-enough?} is to watch how src_scheme[:exports code]{guess} changes
+from one iteration to the next and to stop when the change is a very small
+fraction of the guess.  Design a square-root procedure that uses this kind of
+end test.  Does this work better for small and large numbers?
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+Recall the definition of src_scheme[:exports code]{sqrt-iter} and other helper
+functions from Section 1.1.7.  We will use these as a starting point for this
+exercise.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; calculate the square root of `x` starting with an initial guess `guess`
+  (define (sqrt-iter guess x)
+    (if (good-enough? guess x)
+	  guess
+	  (sqrt-iter (improve guess x)
+		     x)))
+
+  ;; the updating function for calculating the square root of `x` based on current
+  ;; guess `guess`.  This function is used to calculate the (k + 1)-th value in
+  ;; the iterative sequence based on the k-th value in the sequence (and where the
+  ;; k-th value given by `guess`).
+  (define (improve guess x)
+    (average guess (/ x guess)))
+
+  ;; calculate the average of two values `x` and `y`
+  (define (average x y)
+    (/ (+ x y) 2))
+
+  ;; a predicate function that determines if convergence has been achieved based
+  ;; on the values given by `guess` and `x`
+  (define (good-enough? guess x)
+    (< (abs (- (square guess) x)) 0.001))
+#+END_SRC
+
+
+
+
+** Create =safe-sqrt-iter=
+:PROPERTIES:
+:CUSTOM_ID: create-safe-sqrt-iter=
+:END:
+
+Next, in the code below we create a variant of src_scheme[:exports
+code]{sqrt-iter} that we call src_scheme[:exports code]{sqrt-iter-safe}.  This
+new version does two things differently from the previous version.  One new
+thing that it does is that it will exit if convergence has not been achieved in
+src_scheme[:exports code]{max-iter} iterations.  The second new thing that it
+does is to call the src_scheme[:exports code]{trace-improve} function in place
+of the src_scheme[:exports code]{improve} function.  The src_scheme[:exports
+code]{trace-improve} function in turn calls src_scheme[:exports
+code]{trace-average}, which prints the intermediate values and updated term used
+for the next value in the iterative sequence.
+
+We note that the Scheme primitives src_scheme[:exports code]{newline} and
+src_scheme[:exports code]{display} that are used in src_scheme[:exports
+code]{trace-average} are not introduced in this book until Exercise 1.22, but we
+find it helpful to use them here anyway.  These two functions by default write a
+newline to the console and write a written represention of an object to the
+console, respectively.
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; a measure of closeness to be used as a parameter for defining when
+  ;; convergence has occurred
+  (define max-iter 1000)
+
+  ;; calculate the square root of `x` starting with an initial guess `guess`
+  (define (sqrt-iter-safe guess x)
+    (define (sqrt-iter-internal guess n)
+      (cond ((good-enough? guess x) guess)
+	    ((> n 0) (sqrt-iter-internal (trace-improve guess x) (- n 1)))
+	    (else 'convergence-not-achieved)))
+    (sqrt-iter-internal guess max-iter))
+
+  ;; the updating function for calculating the square root of `x` based on current
+  ;; guess `guess`.  This function is used to calculate the (k + 1)-th value in
+  ;; the iterative sequence based on the k-th value in the sequence (and where the
+  ;; k-th value given by `guess`).
+  (define (trace-improve guess x)
+    (trace-average guess (/ x guess)))
+
+  ;; calculate the average of two values `x` and `y`, and include some print
+  ;; statements to trace the values of the iterative sequence
+  (define (trace-average x y)
+      (display "x:   ")
+      (display x)
+      (newline)
+      (display "y:   ")
+      (display y)
+      (newline)
+      (display "res: ")
+      (display (/ (+ x y) 2))
+      (newline)
+      (/ (+ x y) 2))
+#+END_SRC
+
+
+
+
+** Example usage of =sqrt-iter=
+:PROPERTIES:
+:CUSTOM_ID: example-usage-sqrt-iter
+:END:
+
+In the following examples we consider two cases different cases that each cause
+problems when using the current definition of src_scheme[:exports
+code]{good-enough?}.  In the first example, we consider an input of $10^{-8}$.
+When the input is this small, the constant being compared against for
+src_scheme[:exports code]{good-enough} is too big in comparison and as a result
+the convergence criterion is satisfied too early.  We can see that although the
+square root of $10^{-8}$ is $10^{-4}$, the iterative algorithm produces a result
+of about 0.03125 on my machine.
+
+In the second example, we consider an input of $10^{13}$.  In this case we have
+fairly large input, and on my machine we end up with two numbers
+3162277.660168379 and 3162277.6601683795 that we try to take the average of,
+however there doesn't seem to be enough numerical precision to find a number
+between the two.  As a result, taking the average of the two numbers ends up
+producing one of the two values again, which for me happened to be the value
+3162277.6601683795.  Since this was the value for the input for
+src_scheme[:exports code]{guess} to the previous call the src_scheme[:exports
+code]{sqrt-iter-internal}, this causes us to enter an infinite loop.  (Note that
+the exact values will likely vary across different hardware and systems.)
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; the square root of 10^{-8} should be 10^{-4}, however on my machine the
+  ;; result of this procedure is about 0.03125
+  (sqrt-iter-safe 1.0 0.00000001)
+
+  ;; the square root of 10^13 does not converge on my machine, getting stuck
+  ;; providing the value 3162277.6601683795 for the next iteration infinitely many
+  ;; times
+  (sqrt-iter-safe 1.0 10000000000000)
+
+  ;; the system does not seem to have enough precision on my machine to represent
+  ;; values between 3162277.660168379 and 3162277.6601683795
+  3162277.660168379   ;; 3162277.660168379
+  3162277.6601683791  ;; 3162277.660168379
+  3162277.6601683792  ;; 3162277.660168379
+  3162277.6601683793  ;; 3162277.660168379
+  3162277.6601683794  ;; 3162277.6601683795
+  3162277.6601683795  ;; 3162277.6601683795
+#+END_SRC
+
+
+
+
+** Modified comparison functions
+:PROPERTIES:
+:CUSTOM_ID: modified-comparison-functions
+:END:
+
+In this section we create a version of src_scheme[:exports code]{sqrt-iter} that
+we call src_scheme[:exports code]{sqrt-iter-relative} that uses a function
+src_scheme[:exports code]{good-enough-relative?} to compare how close the guess
+is relative to the magnitude of the guess.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; calculate the square root of `x` starting with an initial guess `guess`
+  (define (sqrt-iter-relative guess x)
+    (if (good-enough-relative? guess x)
+	guess
+	(sqrt-iter-relative (improve guess x)
+			    x)))
+
+  ;; a predicate function that determines if convergence has been achieved by
+  ;; taking the difference between the square of `guess` and the target value `x`,
+  ;; divided by the magnitude of `guess`.
+  (define (good-enough-relative? guess x)
+    (< (abs (/ (- (square guess) x)
+	       guess))
+       0.001))
+#+END_SRC
+
+
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+Test src_scheme[:exports code]{sqrt-iter-relative} with problematic inputs.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; some easy problems to ensure that `sqrt-iter-relative` is working properly
+  (sqrt-iter-relative 1.0 2.0)   ;; 1.41421356
+  (sqrt-iter-relative 1.0 4.0)   ;; 2
+  (sqrt-iter-relative 1.0 9.0)   ;; 3
+  (sqrt-iter-relative 1.0 16.0)  ;; 4
+  (sqrt-iter-relative 1.0 25.0)  ;; 5
+
+  ;; the square root of 10^{-8} should be 10^{-4}
+  (sqrt-iter-relative 1.0 0.00000001)
+
+  ;; the square root of 10^13 should be approximately 3162277.66016838
+  (sqrt-iter-relative 1.0 10000000000000)
+#+END_SRC

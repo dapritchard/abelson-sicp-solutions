@@ -199,9 +199,9 @@ A few test cases are shown below.
   (sqrt-alt 16.0)  ;; 4
   (sqrt-alt 25.0)  ;; 5
 
-  ;; y = cos(y) implies y = 0.7390822985224023
+  ;; y = cos(y) has a solution of y = 0.7390822985224023
   (fixed-point-alt cos 1.0)
-  ;; y = sin(y) + cos(y) impiles y = 1.2587315962971173
+  ;; y = sin(y) + cos(y) has a solution of y = 1.2587315962971173
   (fixed-point-alt (lambda (y) (+ (sin y) (cos y)))
 		   1.0)
 #+END_SRC
