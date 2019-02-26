@@ -1,0 +1,117 @@
+#+TITLE: SICP Exercise 2.1
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap02exer01.scm
+
+
+* Exercise 2.1
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Define a better version of src_scheme[:exports code]{make-rat} that handles both
+positive and negative arguments.  src_scheme[:exports code]{make-rat} should
+normalize the sign so that if the rational number is positive, both the
+numerator and denominator are positive, and if the rational number is negative,
+only the numerator is negative.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Previously used functions
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions
+:END:
+
+Recall the definition of src_scheme[:exports code]{gcd} from Section 1.2.5.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd}
+#+BEGIN_SRC scheme
+  ;; calculate the greatest common denominator (GCD) for two positive integers `a`
+  ;; and `b`
+  (define (gcd a b)
+    (if (= b 0)
+	a
+	(gcd b (remainder a b))))
+#+END_SRC
+The following functions were defined in Section 2.1.1.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  ;; takes a rational number data structure as input `x`, and returns the
+  ;; numerator
+  (define (numer x) (car x))
+
+  ;; takes a rational number data structure as input `x`, and returns the
+  ;; denominator
+  (define (denom x) (cdr x))
+
+  ;; define a print function for the rational number data structure
+  (define (print-rat x)
+    (newline)
+    (display (numer x))
+    (display "/")
+    (display (denom x)))
+#+END_SRC
+
+
+
+
+** Definition of new functions
+:PROPERTIES:
+:CUSTOM_ID: new-functions
+:END:
+
+** Define =make-rat=
+:PROPERTIES:
+:CUSTOM_ID: define-make-rat
+:END:
+
+The following is the definition for src_scheme[:exports code]{make-rat}.  Note
+that src_scheme[:exports code]{gcd} is only defined for positive numbers, so we
+bind src_scheme[:exports code]{sign-val} to the sign of src_scheme[:exports
+code]{n} times src_scheme[:exports code]{d} and then use the absolute values for
+src_scheme[:exports code]{n} and src_scheme[:exports code]{d} everywhere else.
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd}
+#+BEGIN_SRC scheme
+  ;; constructor for the rational number data structure
+  (define (make-rat n d)
+    (let ((sign-val (if (< (* n d) 0) -1 1))
+	  (gcd-val (gcd (abs n) (abs d))))
+      (cons (* (/ (abs n) gcd-val)
+	       sign-val)
+	    (/ (abs d) gcd-val))))
+#+END_SRC
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: test-cases
+:END:
+
+Some test cases are shown below.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs}
+#+BEGIN_SRC scheme
+  (print-rat (make-rat  24  6))  ;; 4/1
+  (print-rat (make-rat  24 -6))  ;; -4/1
+  (print-rat (make-rat -24  6))  ;; -4/1
+  (print-rat (make-rat -24 -6))  ;; 4/1
+
+  (print-rat (make-rat  24  7))  ;; 24/7
+  (print-rat (make-rat  24 -7))  ;; -24/7
+  (print-rat (make-rat -24  7))  ;; -247
+  (print-rat (make-rat -24 -7))  ;; 24/7
+
+  (print-rat (make-rat  6  18))  ;; 1/3
+  (print-rat (make-rat  6 -18))  ;; -1/3
+  (print-rat (make-rat -6  18))  ;; -1/3
+  (print-rat (make-rat -6 -18))  ;; 1/3
+
+  (print-rat (make-rat 0  1))  ;; 0/1
+  (print-rat (make-rat 0 -1))  ;; 0/1
+#+END_SRC
