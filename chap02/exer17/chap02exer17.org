@@ -1,0 +1,56 @@
+#+TITLE: SICP Exercise 2.17
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap02exer17.scm
+
+* Exercise 2.17
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Define a procedure src_scheme[:exports code]{last-pair} that returns the list
+that contains only the last element of a given (nonempty) list:
+
+#+BEGIN_SRC scheme
+  (last-pair (list 23 72 149 34))  ;; returns (34)
+#+END_SRC
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Definition of =last-pair=
+:PROPERTIES:
+:CUSTOM_ID: last-pair
+:END:
+
+Here we define src_scheme[:exports code]{last-pair}.  Note that the command
+src_scheme[:exports code]{null?} was introduced in the section text, and the
+notation src_scheme[:exports code]{'()} for the empty list is provided in one of
+the footnotes.
+#+BEGIN_SRC scheme
+  (define (last-pair x)
+    (cond ((null? x) '())
+          ((null? (cdr x)) x)
+          (last-pair (cdr x))))
+#+END_SRC
+
+
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+The following are some examples of using src_scheme[:exports code]{last-pair}.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd}
+#+BEGIN_SRC scheme
+  (last-pair (list 23 72 149 34))  ;; returns (34)
+  (last-pair (list 1))             ;; returns (1)
+  (last-pair '())                  ;; returns ()
+#+END_SRC
