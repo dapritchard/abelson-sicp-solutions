@@ -1,0 +1,93 @@
+#+TITLE: SICP Exercise 2.24
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap01exer24.scm
+
+
+* Exercise 1.24
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Suppose we evaluate the expression src_scheme[:exports code]{(list 1 (list 2
+(list 3 4)))}.  Give the result printed by the interpreter, the corresponding
+box-and-pointer structure, and the interpretation of this as a tree.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+The result printed by the interpreter is the following.
+#+BEGIN_SRC scheme
+  (1 (2 (3 4)))
+#+END_SRC
+
+To aid in drawing the figure we can write the list using only
+src_scheme[:exports code]{cons} calls as follows.  One approach to building up
+this particular structure is to construct it from the inside and work our way
+out.
+#+BEGIN_SRC scheme
+  ;; the innermost piece:  (3 4)
+  (cons 3
+        (cons 4 '()))
+
+  ;; next we move up a level to (2 (3 4)).  We need the "cons of the cons" so that
+  ;; you have an element in the cdr of the top-level list who's car is (3 4) and
+  ;; who's cdr is nil.
+  (cons 2
+        (cons (cons 3
+                    (cons 4 '()))
+              '()))
+
+  ;; moving to the outermost level (1 (2 (3 4))).  Again, by the same reasoning as
+  ;; before we conclude that we need another "cons of a cons" so that the cdr of
+  ;; the top-level list is an element who's car is 2 and who's cdr is (3 4).
+  (cons 1
+        (cons (cons 2
+                    (cons (cons 3
+                                (cons 4 '()))
+                          '()))
+              '()))
+#+END_SRC
+
+From the src_scheme[:exports code]{cons}-only representation it is easy to see
+what is the src_scheme[:exports code]{car} and the src_scheme[:exports
+code]{cdr} of each pair.  The box-and-pointer figure then is the following.
+#+BEGIN_EXAMPLE
+  (1 (2 (3 4)))  +---+---+           +---+---+        
+        -------->| * | *-+---------->| * | \ |
+                 +-|-+---+           +-|-+---+        
+                   |                   |              
+                   V                   V              
+                 +---+    (2 (3 4))  +---+---+        +---+---+            
+                 | 1 |         ----->| * | *-+------->| * | / |            
+                 +---+               +-|-+---+        +-|-+---+            
+                                       |                |      
+                                       V                V      
+                                     +---+     (3 4)  +---+---+        +---+---+
+                                     | 2 |      ----->| * | * +------->| * | / |
+                                     +---+            +-|-+---+        +-|-+---+
+                                                        |                |
+                                                        V                V
+                                                      +---+            +---+
+                                                      | 3 |            | 4 |
+                                                      +---+            +---+
+#+END_EXAMPLE
+
+The corresponding tree representation is the following.
+#+BEGIN_EXAMPLE
+  (1 (2 (3 4))
+       ^
+     /   \
+    /     \ 
+   1   (2 (3 4))
+           ^ 
+         /   \
+        2   (3 4)
+              ^
+             / \
+            3   4
+#+END_EXAMPLE
