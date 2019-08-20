@@ -1,9 +1,9 @@
-#+TITLE: SICP Exercise 1.&&
+#+TITLE: SICP Exercise 2.&&
 #+SETUPFILE: ../../export-setup/main-settings.org
-#+PROPERTY: header-args :tangle chap01exer&&.scm
+#+PROPERTY: header-args :tangle chap02exer&&.scm
 
 
-* Exercise 1.&&
+* Exercise 2.&&
 :PROPERTIES:
 :CUSTOM_ID: exercise
 :END:
@@ -11,7 +11,7 @@
 Provide exercise prompt here.  Here is an inline code section:
 src_scheme[:exports code]{some code}.
 
-#+ATTR_LATEX: :options morekeywords={define,lambda,if}
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd,append,map,null,cons,list,reverse}
 #+BEGIN_SRC scheme
   (myfun some data)
 #+END_SRC
