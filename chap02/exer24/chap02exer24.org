@@ -1,9 +1,9 @@
 #+TITLE: SICP Exercise 2.24
 #+SETUPFILE: ../../export-setup/main-settings.org
-#+PROPERTY: header-args :tangle chap01exer24.scm
+#+PROPERTY: header-args :tangle chap02exer24.scm
 
 
-* Exercise 1.24
+* Exercise 2.24
 :PROPERTIES:
 :CUSTOM_ID: exercise
 :END:
@@ -35,7 +35,7 @@ out.
         (cons 4 '()))
 
   ;; next we move up a level to (2 (3 4)).  We need the "cons of the cons" so that
-  ;; you have an element in the cdr of the top-level list who's car is (3 4) and
+  ;; you have an pair in the cdr of the top-level list who's car is (3 4) and
   ;; who's cdr is nil.
   (cons 2
         (cons (cons 3
@@ -44,7 +44,7 @@ out.
 
   ;; moving to the outermost level (1 (2 (3 4))).  Again, by the same reasoning as
   ;; before we conclude that we need another "cons of a cons" so that the cdr of
-  ;; the top-level list is an element who's car is 2 and who's cdr is (3 4).
+  ;; the top-level list is an pair who's car is 2 and who's cdr is (3 4).
   (cons 1
         (cons (cons 2
                     (cons (cons 3

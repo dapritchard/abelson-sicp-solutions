@@ -1,0 +1,200 @@
+#+TITLE: SICP Exercise 2.40
+#+SETUPFILE: ../../export-setup/main-settings.org
+#+PROPERTY: header-args :tangle chap02exer40.scm
+
+
+* Exercise 2.40
+:PROPERTIES:
+:CUSTOM_ID: exercise
+:END:
+
+Define a procedure src_scheme[:exports code]{unique-pairs} that, given an
+integer $n$, generates the sequence of pairs $(i,j)$ with $1 \leq j < i \leq n$.
+Use src_scheme[:exports code]{unique-pairs} to simplify the definition of
+src_scheme[:exports code]{prime-sum-pairs} given above.
+
+
+
+
+* Solution
+:PROPERTIES:
+:CUSTOM_ID: solution
+:END:
+
+** Previously used functions needed for =unique-pairs=.
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions-unique-pairs
+:END:
+
+The following functions were created in Section 2.2.3, and are used in the
+definition of src_scheme[:exports code]{unique-pairs}.
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd,append,map,null,cons,list,reverse}
+#+BEGIN_SRC scheme
+  ;; takes a function `proc` and sequence `seq`, and "flattens" the result of
+  ;; applying `proc` to each element of `seq`.  In more detail, assume that the
+  ;; result of applying `proc` to any given element of `seq` is itself a list, and
+  ;; let `x_i` denote the list created by applying `proc` to the i-th element of
+  ;; `seq` and `n_i` denote the number of elements in `x_i`.  Then the k-th
+  ;; element of `x_i` is the `n_1 + ... + n_{i-1} + k`-th element in the list
+  ;; returned by the function.
+  (define (flatmap proc seq)
+    (accumulate append '() (map proc seq)))
+
+
+  ;; takes a function `op`, object `initial`, and sequence `sequence`, and applies
+  ;; `op` with arguments given by the first element of `sequence` and the second
+  ;; element of `sequence`, and then repeatedly applies `op` to the result with
+  ;; the next element in `sequence`.  This continues until all of the elements in
+  ;; `seq` have been applied, at which point `op` is applied to this result and
+  ;; `initial`, with this result being the value returned by the function.
+  (define (accumulate op initial sequence)
+    (if (null? sequence)
+        initial
+        (op (car sequence)
+            (accumulate op initial (cdr sequence)))))
+
+
+  ;; takes two positive integers `low` and `high` as inputs such that `low` is no
+  ;; greater than `high`, and returns the list of integers `(low, low + 1, ...,
+  ;; high)`
+  (define (enumerate-interval low high)
+    (if (> low high)
+        '()
+        (cons low (enumerate-interval (+ low 1) high))))
+#+END_SRC
+
+
+
+
+
+
+
+** Previously used functions needed for =prime-sum-pairs=.
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions-prime-sum-pairs
+:END:
+
+#+BEGIN_EXPORT latex
+The following function was created in Section 2.2.3, and is used in the
+definition of \lstinline{prime-}\allowbreak{}\lstinline{sum-}\allowbreak\lstinline{pairs}.
+#+END_EXPORT
+#+BEGIN_EXPORT html
+The following function was created in Section 2.2.3, and is used in the
+definition of <code>prime-sum-pairs</code>.
+#+END_EXPORT
+
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd,append,map,null,cons,list,reverse}
+#+BEGIN_SRC scheme
+  ;; takes a length-2 list of numbers `pair` as input, and returns a length-3 list
+  ;; of numbers, where the first two elements of the new list are the elements
+  ;; from the input list, and the third element is the value of the sum of the
+  ;; pair
+  (define (make-pair-sum pair)
+    (list (car pair) (cadr pair) (+ (car pair) (cadr pair))))
+
+
+  ;; takes a length-2 list such that each element is a positive integer, and
+  ;; returns #t if the sum of the integers is a prime number and #f otherwise
+  (define (prime-sum? pair)
+    (prime? (+ (car pair) (cadr pair))))
+#+END_SRC
+
+
+
+
+** Previously used functions needed for =prime-sum?=.
+:PROPERTIES:
+:CUSTOM_ID: previously-used-functions-prime-sum
+:END:
+
+The following functions were defined in Section 1.2.6, and are used to provide
+the src_scheme[:exports code]{prime?} functionality used by src_scheme[:exports
+code]{prime-sum?}.  Also recall that in Exercises 1.23 through 1.28 we
+investigated alternative formulations of prime number testing procedures (not
+shown here).
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd,append,map,null,cons,list,reverse}
+#+BEGIN_SRC scheme
+  ;; test if `n` is a prime number, since by definition if the smallest divisor of
+  ;; a number (other than 1) is itself, then the number is prime.
+  (define (prime? n)
+    (= n (smallest-divisor n)))
+
+
+  ;; driver function to call the recursive `find-driver` function with starting
+  ;; seed of 2 (i.e the first number to check against `n` as a divisor)
+  (define (smallest-divisor n)
+    (find-divisor n 2))
+
+
+  ;; returns the smallest divisor of `n` that is greater than or equal to than
+  ;; `test-divisor`
+  (define (find-divisor n test-divisor)
+    (cond ((> (square test-divisor) n) n)
+          ((divides? test-divisor n) test-divisor)
+          (else (find-divisor n (+ test-divisor 1)))))
+
+
+  ;; test if `a` evenly divides `b`
+  (define (divides? a b)
+    (= (remainder b a) 0))
+#+END_SRC
+
+
+
+** Definition of new functions
+:PROPERTIES:
+:CUSTOM_ID: new-functions
+:END:
+
+
+The src_scheme[:exports code]{unique-pairs} function is directly extracted from
+the original src_scheme[:exports code]{prime-sum-pairs} function in Section
+2.2.3 (and is wrapped in a call to reverse to change the order of the pairs).
+Then, a new version of src_scheme[:exports code]{prime-sum-pairs} is defined
+based on the extracted function.
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd,append,map,null,cons,list,reverse}
+#+BEGIN_SRC scheme
+  ;; calculate all pairs of integers `(i, j)` such that `1 <= j < i <= n`.  The
+  ;; pairs are provided in the order (n, n - 1), (n, n - 2), ..., (n, 1), (n - 1,
+  ;; n - 2), (n - 1, n - 3), ...
+  (define (unique-pairs n)
+    (reverse
+     (flatmap (lambda (i)
+                (map (lambda (j) (list i j))
+                     (enumerate-interval 1 (- i 1))))
+              (enumerate-interval 1 n))))
+
+  ;; calculates all pairs of integers `(i, j)` such that `1 <= j < i <= n` and `i
+  ;; + j` is a prime number.  A list is returned such that each element is a list
+  ;; of the form `(i, j, i + j)`, with elements ordered according to the same
+  ;; ordering provided by `unique-pairs` with respect to the `(i, j)` terms.
+  (define (prime-sum-pairs n)
+    (map make-pair-sum
+         (filter prime-sum?
+                 (unique-pairs n))))
+#+END_SRC
+
+
+
+** Test cases
+:PROPERTIES:
+:CUSTOM_ID: example-usage
+:END:
+
+A few test cases using src_scheme[:exports code]{unique-pairs} and
+src_scheme[:exports code]{prime-sum-pairs} are shown below.
+#+ATTR_LATEX: :options morekeywords={define,lambda,if},deletekeywords={abs,gcd,append,map,null,cons,list,reverse}
+#+BEGIN_SRC scheme
+  (unique-pairs 1)  ;; ()
+  (unique-pairs 2)  ;; ((2 1))
+  (unique-pairs 3)  ;; ((3 2) (3 1) (2 1))
+  (unique-pairs 4)  ;; ((4 3) (4 2) (4 1) (3 2) (3 1) (2 1))
+
+  (prime-sum-pairs 0)  ;; ()
+  (prime-sum-pairs 1)  ;; () 
+  (prime-sum-pairs 2)  ;; ((2 1 3))
+  (prime-sum-pairs 3)  ;; ((3 2 5) (2 1 3))
+  (prime-sum-pairs 4)  ;; ((4 3 7) (4 1 5) (3 2 5) (2 1 3))
+  (prime-sum-pairs 5)  ;; ((5 2 7) (4 3 7) (4 1 5) (3 2 5) (2 1 3))
+#+END_SRC
